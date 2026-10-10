@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glow Mates — Massage Candles</title>
+<meta name="description" content="Soy wax massage candles. Melt, massage, relax. Creamy Dunes, Sea Yeah, Sakura Whisper.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="progress" class="progress"></div>
+<div id="cursor" class="cursor" aria-hidden="true"></div>
+<header class="top">
+  <a href="#hero" class="logo">Glow Mates</a>
+  <button id="cartBtn" class="cart-btn" aria-label="Open cart">Cart <span id="cartCount">0</span></button>
+</header>
+
+<main>
+<section id="hero" class="sec hero" data-bg="#F6E3D3" data-ink="#2a1710">
+  <div class="hero-words" aria-label="Glow Mates">
+    <h1><span class="line"><span class="w">Glow</span></span><span class="line"><span class="w d2">Mates</span></span></h1>
+    <p class="tag">Soy wax candles that melt into warm massage oil.</p>
+    <a href="#creamy" class="btn">Pick your scent</a>
+  </div>
+  <canvas id="embers" class="embers" aria-hidden="true"></canvas>
+  <div class="hero-img">
+    <div class="arch"><img src="images/trio.jpg" alt="Creamy Dunes, Sea Yeah and Sakura Whisper candles" data-par="0.08"></div>
+    <div class="flame" aria-hidden="true"></div>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true"><div class="track">
+  <span>Melt.</span><span>Massage.</span><span>Relax.</span><span>Melt.</span><span>Massage.</span><span>Relax.</span>
+  <span>Melt.</span><span>Massage.</span><span>Relax.</span><span>Melt.</span><span>Massage.</span><span>Relax.</span>
+</div></div>
+
+<section id="creamy" class="sec product" data-bg="#E9CFA0" data-ink="#3a2410" data-id="creamy">
+  <div class="p-img"><img src="images/creamy.jpg" alt="Creamy Dunes candle" loading="lazy"><i class="grain g1"></i></div>
+  <div class="p-info">
+    <p class="scent">Coconut, vanilla bean</p>
+    <h2 class="split">Creamy Dunes</h2>
+    <p class="blurb">Warm sand, toasted coconut and soft vanilla. Light it, wait for the pool to melt, then pour it on skin.</p>
+    <ul class="made"><li>Soy wax</li><li>Shea butter</li><li>Sweet almond oil</li><li>Skin-safe fragrance</li></ul>
+    <div class="buy">
+      <div class="price">300 EGP</div>
+      <div class="qty"><button data-q="-1" aria-label="Less">−</button><output>1</output><button data-q="1" aria-label="More">+</button></div>
+    </div>
+    <label class="note-l">Note for this candle <textarea rows="2" maxlength="300" placeholder="Gift message, wick preference, anything we should know"></textarea></label>
+    <button class="btn add">Add to cart</button>
+  </div>
+</section>
+
+<section id="sea" class="sec product flip" data-bg="#F49A6B" data-ink="#3b1608" data-id="sea">
+  <div class="p-img"><img src="images/sea.jpg" alt="Sea Yeah candle" loading="lazy"><i class="grain g2"></i></div>
+  <div class="p-info">
+    <p class="scent">Mango, passion fruit, pineapple, coconut</p>
+    <h2 class="split">Sea Yeah</h2>
+    <p class="blurb">Sunset on a beach you wish you were on. Bright fruit up top, coconut underneath.</p>
+    <ul class="made"><li>Soy wax</li><li>Shea butter</li><li>Sweet almond oil</li><li>Skin-safe fragrance</li></ul>
+    <div class="buy">
+      <div class="price">300 EGP</div>
+      <div class="qty"><button data-q="-1" aria-label="Less">−</button><output>1</output><button data-q="1" aria-label="More">+</button></div>
+    </div>
+    <label class="note-l">Note for this candle <textarea rows="2" maxlength="300" placeholder="Gift message, wick preference, anything we should know"></textarea></label>
+    <button class="btn add">Add to cart</button>
+  </div>
+</section>
+
+<section id="sakura" class="sec product" data-bg="#F4B9BE" data-ink="#3a1420" data-id="sakura">
+  <div class="p-img"><img src="images/sakura.jpg" alt="Sakura Whisper candle" loading="lazy"><i class="grain g3"></i></div>
+  <div class="p-info">
+    <p class="scent">Cherry blossom, rose</p>
+    <h2 class="split">Sakura Whisper</h2>
+    <p class="blurb">Soft florals for two. The one people buy for date night.</p>
+    <ul class="made"><li>Soy wax</li><li>Shea butter</li><li>Sweet almond oil</li><li>Skin-safe fragrance</li></ul>
+    <div class="buy">
+      <div class="price">300 EGP</div>
+      <div class="qty"><button data-q="-1" aria-label="Less">−</button><output>1</output><button data-q="1" aria-label="More">+</button></div>
+    </div>
+    <label class="note-l">Note for this candle <textarea rows="2" maxlength="300" placeholder="Gift message, wick preference, anything we should know"></textarea></label>
+    <button class="btn add">Add to cart</button>
+  </div>
+</section>
+
+<section class="sec light" data-bg="#1a0d09" data-ink="#F6E3D3" id="light">
+  <div class="l-text">
+    <h2 class="split">Light it</h2>
+    <p class="blurb">Tap the wick. Watch the wax turn to warm oil.</p>
+    <p id="lstate" class="lstate">Unlit</p>
+    <div class="meltbar"><i id="meltfill"></i></div>
+  </div>
+  <button id="jar" class="jar" aria-label="Light the candle" aria-pressed="false">
+    <span class="glowhalo"></span>
+    <span class="flame2"></span>
+    <span class="wick"></span>
+    <span class="glass"><span class="wax"><span class="pool"></span></span><span class="drip d1"></span><span class="drip d2"></span><span class="drip d3"></span></span>
+  </button>
+</section>
+
+<section class="sec how" data-bg="#2a1710" data-ink="#F6E3D3">
+  <h2 class="split">How it works</h2>
+  <ol>
+    <li><b>Light it.</b> Let the wax pool melt for 15 minutes.</li>
+    <li><b>Blow it out.</b> Wait a minute so it is warm, not hot.</li>
+    <li><b>Pour and massage.</b> The melted wax turns into a silky oil.</li>
+  </ol>
+  <p class="pay-line">Order here, pay by Instapay, upload your screenshot. We confirm and deliver.</p>
+  <img class="flat" src="images/sea-flatlay.jpg" alt="Sea Yeah candles with dried citrus" loading="lazy">
+</section>
+</main>
+
+<footer class="foot" data-bg="#2a1710" data-ink="#F6E3D3">
+  <span>Glow Mates. Melt. Massage. Relax.</span>
+  <button id="adminBtn" class="admin-btn" aria-label="Admin">Admin</button>
+</footer>
+
+<!-- cart drawer -->
+<div id="scrim" class="scrim"></div>
+<aside id="drawer" class="drawer" aria-hidden="true">
+  <div class="d-head"><h3>Your cart</h3><button class="x" data-close aria-label="Close">×</button></div>
+  <div id="lines" class="lines"></div>
+  <div class="d-foot">
+    <div class="row"><span>Total</span><b id="cartTotal">0 EGP</b></div>
+    <button id="checkoutBtn" class="btn wide">Checkout</button>
+  </div>
+</aside>
+
+<!-- checkout -->
+<div id="checkout" class="modal" aria-hidden="true">
+  <div class="card">
+    <button class="x" data-close aria-label="Close">×</button>
+    <div class="steps"><span id="s1" class="on">Delivery</span><span id="s2">Payment</span></div>
+
+    <form id="step1">
+      <h3>Where should we deliver?</h3>
+      <label>Full name<input name="name" required autocomplete="name"></label>
+      <label>Phone number<input name="phone" required type="tel" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx"></label>
+      <label>Address<textarea name="address" rows="3" required autocomplete="street-address" placeholder="Street, building, floor, city"></textarea></label>
+      <button class="btn wide" type="submit">Continue to payment</button>
+    </form>
+
+    <form id="step2" hidden>
+      <h3>Pay with Instapay</h3>
+      <div id="paySummary" class="pay-sum"></div>
+      <div class="insta">
+        <p>Send <b id="payTotal"></b> to</p>
+        <div class="insta-row"><code id="instaAddr"></code><button type="button" id="copyInsta" class="mini">Copy</button></div>
+      </div>
+      <label class="file">Upload your payment screenshot
+        <input type="file" id="shot" accept="image/*" required>
+      </label>
+      <img id="shotPrev" class="shot-prev" alt="" hidden>
+      <p id="err" class="err" role="alert"></p>
+      <div class="two"><button type="button" id="back" class="btn ghost">Back</button><button id="send" class="btn" type="submit">Send order</button></div>
+    </form>
+
+    <div id="done" hidden class="done">
+      <div class="check">✓</div>
+      <h3>Order sent</h3>
+      <p>Order <b id="doneId"></b>. We will check your payment and message you on your phone.</p>
+      <button class="btn" data-close>Back to the candles</button>
+    </div>
+  </div>
+</div>
+
+<!-- admin -->
+<div id="admin" class="modal" aria-hidden="true">
+  <div class="card wide-card">
+    <button class="x" data-close aria-label="Close">×</button>
+    <form id="login">
+      <h3>Admin</h3>
+      <label>Password<input type="password" id="pw" required autocomplete="current-password"></label>
+      <p id="loginErr" class="err" role="alert"></p>
+      <button class="btn wide" type="submit">Log in</button>
+    </form>
+    <div id="panel" hidden>
+      <div class="p-head"><h3>Orders</h3><button id="refresh" class="mini">Refresh</button><button id="logout" class="mini">Log out</button></div>
+      <div id="orders"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status"></div>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
