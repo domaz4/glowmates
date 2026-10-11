@@ -3,6 +3,7 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const IMG = { creamy: 'images/creamy.jpg', sea: 'images/sea.jpg', sakura: 'images/sakura.jpg' };
 let PRODUCTS = { creamy: { name: 'Creamy Dunes', price: 295 }, sea: { name: 'Sea Yeah', price: 290 }, sakura: { name: 'Sakura Whisper', price: 300 } };
+let SOLD = {};   // candles that are out of stock (the number is never shown to customers)
 let INSTAPAY = '';
 let cart = [];
 try { cart = JSON.parse(localStorage.getItem('gm_cart') || '[]').filter(l => PRODUCTS[l.id]); } catch { cart = []; }
@@ -36,7 +37,7 @@ const I18N = {
     'sakura.name': 'Sakura Whisper', 'sakura.scent': 'Cherry blossom, rose',
     'sakura.blurb': 'Soft florals for two. The one people buy for date night.',
     made1: 'Soy wax', made2: 'Shea butter', made3: 'Sweet almond oil', made4: 'Skin-safe fragrance',
-    noteL: 'Note for this candle', notePh: 'Gift message, wick preference, anything we should know', add: 'Add to cart',
+    noteL: 'Note for this candle', notePh: 'Gift message, wick preference, anything we should know', add: 'Add to cart', noStock: 'No stock',
     lightH: 'Light it', lightP: 'Tap the wick. Watch the wax turn to warm oil.', unlit: 'Unlit',
     states: ['Lit. Warming up…', 'Pool forming…', 'Almost ready…', 'Melted. Pour and massage.'],
     howH: 'How it works',
@@ -73,7 +74,7 @@ const I18N = {
     'sakura.name': 'ساكورا ويسبر', 'sakura.scent': 'زهر الكرز، ورد',
     'sakura.blurb': 'زهور ناعمة لشخصين. الاختيار الأول للّيالي الرومانسية.',
     made1: 'شمع الصويا', made2: 'زبدة الشيا', made3: 'زيت اللوز الحلو', made4: 'عطر آمن للبشرة',
-    noteL: 'ملاحظة لهذه الشمعة', notePh: 'رسالة إهداء، تفضيل الفتيل، أي شيء تود إخبارنا به', add: 'أضف إلى السلة',
+    noteL: 'ملاحظة لهذه الشمعة', notePh: 'رسالة إهداء، تفضيل الفتيل، أي شيء تود إخبارنا به', add: 'أضف إلى السلة', noStock: 'نفد المخزون',
     lightH: 'أشعلها', lightP: 'المس الفتيل. شاهد الشمع يتحول إلى زيت دافئ.', unlit: 'مطفأة',
     states: ['مشتعلة. جارٍ التسخين…', 'تتكوّن البركة…', 'على وشك الجاهزية…', 'ذابت. اسكبها ودلّك.'],
     howH: 'طريقة الاستخدام',
@@ -121,7 +122,7 @@ function setLang(l, persist = true) {
   $$('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', D[el.dataset.i18nAria]));
   $('.track').innerHTML = Array(4).fill([D.melt, D.massage, D.relax]).flat().map(w => `<span>${esc(w)}</span>`).join('');
   $$('[data-price]').forEach(el => { el.textContent = PRODUCTS[el.dataset.price].price + ' ' + D.egp; });
-  fillQuick();
+  applyStock();
   $('#langBtn').textContent = l === 'ar' ? 'English' : 'العربية';
   renderSoundBtn();
   document.title = D.title; $('meta[name=description]').content = D.desc;
@@ -161,6 +162,7 @@ function fillQuick() {
   $('#qvImg').src = IMG[qvId]; $('#qvImg').alt = pname(qvId);
   $('#qvScent').textContent = t(qvId + '.scent'); $('#qvName').textContent = pname(qvId); $('#qvBlurb').textContent = t(qvId + '.blurb');
   $('#qvPrice').textContent = PRODUCTS[qvId].price + ' ' + t('egp');
+  const out = !!SOLD[qvId], ab = $('#qvAdd'); ab.disabled = out; ab.classList.toggle('so', out); ab.textContent = out ? t('noStock') : t('add');
 }
 function openQuick(id) {
   qvId = id; $('#qvQty').textContent = 1; $('#qvNote').value = '';
@@ -169,14 +171,38 @@ function openQuick(id) {
 $('#shop').addEventListener('click', e => {
   const card = e.target.closest('.pcard'); if (!card) return;
   const id = card.dataset.id, qa = e.target.closest('.qa');
-  if (qa) { addLine(id, 1, ''); fly(qa); toast(t('added')(pname(id))); } else openQuick(id);
+  if (qa) { if (SOLD[id]) { toast(t('noStock')); return; } addLine(id, 1, ''); fly(qa); toast(t('added')(pname(id))); } else openQuick(id);
 });
 $$('#quick .qty button').forEach(b => b.onclick = () => { const o = $('#qvQty'); o.textContent = Math.max(1, Math.min(50, +o.textContent + +b.dataset.q)); });
 $('#qvAdd').onclick = e => {
+  if (SOLD[qvId]) return;
   addLine(qvId, +$('#qvQty').textContent, $('#qvNote').value.trim());
   fly(e.currentTarget); toast(t('added')(pname(qvId))); openModal($('#quick'), false);
 };
 new MutationObserver(() => { if (!$('#quick').classList.contains('on')) { qvId = null; curSnd = null; updateSound(); } }).observe($('#quick'), { attributes: true, attributeFilter: ['class'] });
+/* ---------- stock: only a red "No stock" badge, never the number ---------- */
+function applyStock() {
+  $$('.pcard').forEach(c => {
+    const out = !!SOLD[c.dataset.id], box = c.querySelector('.p-img');
+    c.classList.toggle('soldout', out);
+    let b = box.querySelector('.so-badge');
+    if (out) { if (!b) { b = document.createElement('span'); b.className = 'so-badge'; box.appendChild(b); } b.textContent = t('noStock'); }
+    else if (b) b.remove();
+  });
+  const n = cart.length; cart = cart.filter(l => !SOLD[l.id]);
+  if (cart.length !== n) { save(); toast(t('noStock')); }
+  fillQuick();
+}
+async function loadStock() {
+  if (!SB) return;
+  try {
+    const r = await rpc('get_stock', {}); if (!r.ok) return;
+    const j = await r.json(); SOLD = {};
+    Object.keys(PRODUCTS).forEach(id => { if (j[id] === false) SOLD[id] = true; });
+    applyStock();
+  } catch { }
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) loadStock(); });
 /* ---------- review lightbox ---------- */
 $('#reviews').addEventListener('click', e => { const im = e.target.closest('.rev-box img'); if (!im) return; $('#lbImg').src = im.src; openModal($('#lightbox')); });
 $('#lightbox').addEventListener('click', () => openModal($('#lightbox'), false));
@@ -308,6 +334,8 @@ $('#step2').onsubmit = async e => {
   if (!SB) { $('#err').textContent = t('errNoSb'); return; }
   const btn = $('#send'); btn.disabled = true; btn.textContent = t('sending'); $('#err').textContent = '';
   try {
+    await loadStock();
+    if (!cart.length) throw new Error(t('noStock'));
     let file = 'free-order';
     if (!free) {
       const ext = (f.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5) || 'jpg';
@@ -399,6 +427,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) Objec
 {
   let saved = null; try { saved = localStorage.getItem('gm_lang'); } catch { }
   setLang(saved === 'ar' ? 'ar' : 'en', false);
+  loadStock();
   if (saved !== 'ar' && saved !== 'en') openModal($('#langPick'));
   else showAd(1200);
 }
