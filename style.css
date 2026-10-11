@@ -311,3 +311,11 @@ html[dir=rtl] .wheel-fab{left:auto;right:16px}
 .row.sub{font-size:1rem;opacity:.85}
 .free-note{background:#2a1710;color:#fff7ef;border-radius:14px;padding:16px;margin:12px 0;text-align:center;font-weight:700}
 @media (prefers-reduced-motion:reduce){#wheelSvg{transition-duration:.01ms}.wheel-fab.ready{animation:none}}
+
+/* sold out */
+.so-badge{position:absolute;top:12px;inset-inline-start:12px;z-index:3;background:#d62828;color:#fff;font:800 .74rem var(--sans);letter-spacing:.07em;text-transform:uppercase;padding:7px 14px;border-radius:999px;box-shadow:0 8px 22px -6px rgba(214,40,40,.7);animation:soPulse 2.4s ease-in-out infinite}
+@keyframes soPulse{50%{box-shadow:0 8px 30px -2px rgba(214,40,40,1)}}
+.pcard.soldout .p-img img{filter:grayscale(.9) brightness(.8)}
+.pcard.soldout .qa{opacity:.35}
+.pcard.soldout .price{text-decoration:line-through;opacity:.5}
+#qvAdd.so,#qvAdd:disabled{background:#d62828;color:#fff;opacity:1;cursor:not-allowed;transform:none}
