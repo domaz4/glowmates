@@ -23,7 +23,7 @@ const I18N = {
   en: {
     title: 'Glow Mates — Massage Candles',
     desc: 'Soy wax massage candles. Melt, massage, relax. Creamy Dunes, Sea Yeah, Sakura Whisper.',
-    sound: 'Ambient sound', tapSound: 'Tap anywhere to turn on the sound 🔊', shopH: 'Our candles', view: 'Quick view', cart: 'Cart', openCart: 'Open cart', close: 'Close', less: 'Less', more: 'More', jar: 'Light the candle',
+    sound: 'Ambient sound', tapSound: 'Tap anywhere to turn on the sound 🔊', shopH: 'Our candles', reviewsH: 'Customer reviews', view: 'Quick view', cart: 'Cart', openCart: 'Open cart', close: 'Close', less: 'Less', more: 'More', jar: 'Light the candle',
     tag: 'Soy wax candles that melt into warm massage oil.', pick: 'Pick your scent',
     melt: 'Melt.', massage: 'Massage.', relax: 'Relax.',
     'creamy.name': 'Creamy Dunes', 'creamy.scent': 'Coconut, vanilla bean',
@@ -55,7 +55,7 @@ const I18N = {
   ar: {
     title: 'Glow Mates — شموع التدليك',
     desc: 'شموع تدليك من شمع الصويا. ذوّب، دلّك، استرخِ. كريمي ديونز، سي ياه، ساكورا ويسبر.',
-    sound: 'الصوت', tapSound: 'المس الشاشة لتشغيل الصوت 🔊', shopH: 'شموعنا', view: 'نظرة سريعة', cart: 'السلة', openCart: 'افتح السلة', close: 'إغلاق', less: 'أقل', more: 'أكثر', jar: 'أشعل الشمعة',
+    sound: 'الصوت', tapSound: 'المس الشاشة لتشغيل الصوت 🔊', shopH: 'شموعنا', reviewsH: 'آراء عملائنا', view: 'نظرة سريعة', cart: 'السلة', openCart: 'افتح السلة', close: 'إغلاق', less: 'أقل', more: 'أكثر', jar: 'أشعل الشمعة',
     tag: 'شموع صويا تتحول إلى زيت تدليك دافئ.', pick: 'اختر رائحتك',
     melt: 'ذوّب.', massage: 'دلّك.', relax: 'استرخِ.',
     'creamy.name': 'كريمي ديونز', 'creamy.scent': 'جوز الهند، حبوب الفانيليا',
@@ -164,6 +164,9 @@ $('#qvAdd').onclick = e => {
   fly(e.currentTarget); toast(t('added')(pname(qvId))); openModal($('#quick'), false);
 };
 new MutationObserver(() => { if (!$('#quick').classList.contains('on')) { qvId = null; curSnd = null; updateSound(); } }).observe($('#quick'), { attributes: true, attributeFilter: ['class'] });
+/* ---------- review lightbox ---------- */
+$('#reviews').addEventListener('click', e => { const im = e.target.closest('.rev-box img'); if (!im) return; $('#lbImg').src = im.src; openModal($('#lightbox')); });
+$('#lightbox').addEventListener('click', () => openModal($('#lightbox'), false));
 function fly(from) {
   const a = from.getBoundingClientRect(), b = $('#cartBtn').getBoundingClientRect();
   const d = document.createElement('div'); d.className = 'fly';
