@@ -14,7 +14,7 @@ const CANDLES = [
 ];
 const NAME2ID = { 'creamy dunes': 'creamy', 'sea yeah': 'sea', 'sakura whisper': 'sakura' };
 const LOW = 3;                       // "Running low" at this many or fewer
-let ORDERS = [], STOCK = {}, FILTER = 'all';
+let ORDERS = [], STOCK = {};
 
 let tt;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 2400); }
@@ -35,16 +35,12 @@ $('#refresh').onclick = () => loadAll();
 function renderStock() {
   $('#stock').innerHTML = CANDLES.map(c => {
     const q = STOCK[c.id], known = q !== undefined;
-    const st = !known ? 'na' : q <= 0 ? 'out' : q <= LOW ? 'low' : 'ok';
-    const label = { ok: 'In stock', low: 'Running low', out: 'No stock', na: 'Not set up' }[st];
-    return `<div class="sc ${st}" style="--tone:${c.tone}">
-      <div class="sc-img"><img src="${c.img}" alt=""><span class="dot"></span></div>
-      <div class="sc-body">
-        <h4>${esc(c.name)}</h4>
-        <span class="pill ${st}">${label}</span>
-        <div class="sc-qty"><button data-sd="-1" data-id="${c.id}" aria-label="Remove one">−</button><output>${known ? q : '–'}</output><button data-sd="1" data-id="${c.id}" aria-label="Add one">+</button></div>
-        <div class="sc-set"><input type="number" min="0" inputmode="numeric" placeholder="Set to…" data-si="${c.id}"><button class="mini" data-ss="${c.id}">Set</button></div>
-      </div>
+    const st = !known ? '' : q <= 0 ? 'out' : q <= LOW ? 'pending' : 'confirmed';
+    const label = !known ? 'Not set up' : q <= 0 ? 'No stock' : q <= LOW ? 'Running low' : 'In stock';
+    return `<div class="srow ${q <= 0 && known ? 'out' : ''}">
+      <h4>${esc(c.name)} <span class="badge ${st}">${label}</span></h4>
+      <button class="mini" data-sd="-1" data-id="${c.id}">−</button><output>${known ? q : '–'}</output><button class="mini" data-sd="1" data-id="${c.id}">+</button>
+      <span class="set"><input type="number" min="0" inputmode="numeric" placeholder="Set to" data-si="${c.id}"><button class="mini" data-ss="${c.id}">Set</button></span>
     </div>`;
   }).join('');
 }
@@ -74,12 +70,8 @@ $('#stock').addEventListener('click', e => {
 $('#stock').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.dataset.si) $(`[data-ss="${e.target.dataset.si}"]`).click(); });
 
 /* ---------- orders ---------- */
-const STATUSES = ['pending', 'confirmed', 'delivered', 'rejected'];
 function renderOrders() {
-  const count = s => ORDERS.filter(o => o.status === s).length;
-  $('#stats').innerHTML = `<div class="stat p"><b>${count('pending')}</b><small>Pending</small></div><div class="stat c"><b>${count('confirmed')}</b><small>Confirmed</small></div><div class="stat d"><b>${count('delivered')}</b><small>Delivered</small></div>`;
-  $('#filters').innerHTML = ['all', ...STATUSES].map(s => `<button class="chip ${FILTER === s ? 'on' : ''}" data-f="${s}">${s[0].toUpperCase() + s.slice(1)} (${s === 'all' ? ORDERS.length : count(s)})</button>`).join('');
-  const list = FILTER === 'all' ? ORDERS : ORDERS.filter(o => o.status === FILTER);
+  const list = ORDERS;
   $('#orders').innerHTML = list.length ? list.map(o => `
     <div class="order">
       <div>
@@ -99,7 +91,7 @@ function renderOrders() {
         <button class="mini" data-s="pending" data-id="${esc(o.id)}">Pending</button>
         <button class="mini" data-del="${esc(o.id)}">Delete</button>
       </div>
-    </div>`).join('') : '<p class="empty">No orders here.</p>';
+    </div>`).join('') : '<p class="empty">No orders yet.</p>';
 }
 async function loadOrders() {
   if (!SB) return false;
@@ -125,7 +117,6 @@ async function syncStock(o, status) {
   } catch { toast('Status saved, but stock was not updated'); }
 }
 
-$('#filters').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (!b) return; FILTER = b.dataset.f; renderOrders(); });
 $('#orders').addEventListener('click', async e => {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.s) {
@@ -137,4 +128,3 @@ $('#orders').addEventListener('click', async e => {
 });
 
 if (adminPw) loadAll();
-setInterval(() => { if (adminPw && !$('#panel').hidden) loadOrders(); }, 60000);   // pick up new orders
