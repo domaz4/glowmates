@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <script>try{if(localStorage.getItem("gm_lang")==="ar"){document.documentElement.lang="ar";document.documentElement.dir="rtl"}}catch(e){}</script>
 <script>window.gmFb=function(i){var p=i.getAttribute("data-alt");if(p&&!i.dataset.t){i.dataset.t=1;i.src=p}else{i.remove()}}</script>
-<link rel="stylesheet" href="style.css?v=15">
+<link rel="stylesheet" href="style.css?v=16">
 </head>
 <body>
 
@@ -37,8 +37,8 @@
     <div class="arch"><div class="slides" data-par="0.08">
       <img class="slide on" src="images/trio.jpg" alt="Creamy Dunes, Sea Yeah and Sakura Whisper candles">
       <div class="slide fit">
-        <img class="bgimg" src="images/Glowmates%20Coming%20Soon%20Teaser.png" data-alt="images/teaser.png" alt="" aria-hidden="true" onerror="gmFb(this)">
-        <img class="fgimg" src="images/Glowmates%20Coming%20Soon%20Teaser.png" data-alt="images/teaser.png" alt="Glowmates - Coming Soon" onerror="gmFb(this)">
+        <img class="bgimg" src="images/teaser.png" data-alt="images/Glowmates%20Coming%20Soon%20Teaser.png" alt="" aria-hidden="true" onerror="gmFb(this)">
+        <img class="fgimg" src="images/teaser.png" data-alt="images/Glowmates%20Coming%20Soon%20Teaser.png" alt="Glowmates - Coming Soon" onerror="gmFb(this)">
       </div>
     </div></div>
     <div class="flame" aria-hidden="true"></div>
@@ -125,6 +125,12 @@
   <div class="d-head"><h3 data-i18n="cartTitle">Your cart</h3><button class="x" data-close data-i18n-aria="close" aria-label="Close">×</button></div>
   <div id="lines" class="lines"></div>
   <div class="d-foot">
+    <div class="cpn">
+      <div id="cpnForm" class="cpn-form"><input id="cpnIn" data-i18n-ph="cpnPh" placeholder="Coupon code" autocomplete="off" autocapitalize="characters" spellcheck="false"><button type="button" id="cpnApply" class="mini" data-i18n="cpnApply">Apply</button></div>
+      <div id="cpnChip" class="cpn-chip" hidden><span id="cpnTxt"></span><button type="button" id="cpnRm" data-i18n-aria="close" aria-label="Remove">×</button></div>
+      <p id="cpnMsg" class="cpn-msg" role="alert"></p>
+    </div>
+    <div class="row sub" id="discRow" hidden><span data-i18n="discount">Discount</span><b id="discVal"></b></div>
     <div class="row"><span data-i18n="total">Total</span><b id="cartTotal">0 EGP</b></div>
     <button id="checkoutBtn" class="btn wide" data-i18n="checkout">Checkout</button>
   </div>
@@ -147,6 +153,7 @@
     <form id="step2" hidden>
       <h3 data-i18n="payH">Pay with Instapay</h3>
       <div id="paySummary" class="pay-sum"></div>
+      <p id="freeNote" class="free-note" hidden data-i18n="freeNote">Your order is free. No payment needed.</p>
       <div class="insta">
         <p><span data-i18n="send">Send</span> <b id="payTotal"></b> <span data-i18n="to">to</span></p>
         <div class="insta-row"><code id="instaAddr"></code><button type="button" id="copyInsta" class="mini" data-i18n="copy">Copy</button></div>
@@ -203,8 +210,32 @@
   </div>
 </div>
 
+<!-- spin the wheel -->
+<button id="wheelFab" class="wheel-fab ready" type="button" aria-haspopup="dialog"><span class="wf-ic" aria-hidden="true">🎡</span><span id="wheelFabTxt" data-i18n="spinFab">Spin &amp; Win</span></button>
+<div id="wheelModal" class="modal" aria-hidden="true">
+  <div class="card wheel-card">
+    <button class="x" data-close data-i18n-aria="close" aria-label="Close">×</button>
+    <h3 data-i18n="wheelH">Spin &amp; Win</h3>
+    <p class="wsub" data-i18n="wheelSub">One free spin every 24 hours. Win coupons and free candles!</p>
+    <div class="wheel-wrap">
+      <div class="wpointer" aria-hidden="true"></div>
+      <svg id="wheelSvg" viewBox="-104 -104 208 208" role="img" aria-label="Prize wheel"><g id="wheelG"></g><circle r="102" fill="none" stroke="#2a1710" stroke-width="3"/></svg>
+      <button id="spinBtn" class="wheel-hub" type="button" data-i18n="spin">SPIN</button>
+    </div>
+    <label class="wphone"><span data-i18n="wheelPhone">Your phone number</span><input id="wheelPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx"></label>
+    <p id="wheelMsg" class="err" role="alert"></p>
+    <p id="wheelWait" class="wwait" role="status"></p>
+    <div id="wheelWin" class="wwin" hidden>
+      <p id="wwTitle" class="ww-title"></p>
+      <div id="wwCodeRow" class="ww-code" hidden><span data-i18n="wheelCode">Your code</span><b id="wwCode"></b><button type="button" id="wwCopy" class="mini" data-i18n="copy">Copy</button></div>
+      <p id="wwNote" class="ww-note"></p>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast" role="status"></div>
 <script src="config.js?v=3"></script>
-<script src="app.js?v=16"></script>
+<script src="app.js?v=17"></script>
+<script src="wheel.js?v=1"></script>
 </body>
 </html>
