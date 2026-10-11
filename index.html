@@ -138,8 +138,8 @@
     <form id="step1">
       <h3>Where should we deliver?</h3>
       <label>Full name<input name="name" required autocomplete="name"></label>
-      <label>Phone number<input name="phone" required type="tel" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx"></label>
-      <label>Address<textarea name="address" rows="3" required autocomplete="street-address" placeholder="Street, building, floor, city"></textarea></label>
+      <label>Phone number<input name="phone" required minlength="8" maxlength="20" type="tel" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx"></label>
+      <label>Address<textarea name="address" rows="3" required minlength="6" maxlength="400" autocomplete="street-address" placeholder="Street, building, floor, city"></textarea></label>
       <button class="btn wide" type="submit">Continue to payment</button>
     </form>
 
