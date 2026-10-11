@@ -216,3 +216,7 @@ html[dir=rtl] .drawer.on{transform:none}
 html[dir=rtl] .modal:not(#admin) .card .x{right:auto;left:16px}
 html[dir=rtl] .line-item .qty{transform-origin:right}
 html[dir=rtl] input[type=tel]{direction:ltr;text-align:right}
+
+.sound-btn{padding:8px 12px;line-height:1.4}
+.sound-btn.pulse{animation:ping 2s ease-in-out infinite}
+@keyframes ping{50%{box-shadow:0 0 0 8px rgba(255,154,60,.35)}}
