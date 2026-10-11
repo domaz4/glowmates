@@ -32,10 +32,11 @@ async function loadOrders() {
         <p class="meta">${new Date(o.created_at).toLocaleString()}</p>
         <p><b>${esc(o.name)}</b> · <a href="tel:${esc(o.phone)}">${esc(o.phone)}</a></p>
         <p>${esc(o.address)}</p>
+        ${o.coupon ? `<p class="note">Coupon ${esc(o.coupon)} · −${esc(o.discount)} EGP</p>` : ''}
         <ul>${o.items.map(i => `<li>${esc(i.qty)} × ${esc(i.name)}${i.note ? ` <span class="note">"${esc(i.note)}"</span>` : ''}</li>`).join('')}</ul>
         <p><b>Total ${esc(o.total)} EGP</b></p>
       </div>
-      <a href="${esc(proofUrl(o.screenshot))}" target="_blank" rel="noopener"><img src="${esc(proofUrl(o.screenshot))}" alt="Payment proof"></a>
+      ${o.screenshot === 'free-order' ? '<p class="note"><b>Free order, no payment needed</b></p>' : `<a href="${esc(proofUrl(o.screenshot))}" target="_blank" rel="noopener"><img src="${esc(proofUrl(o.screenshot))}" alt="Payment proof"></a>`}
       <div class="acts">
         <button class="mini" data-s="confirmed" data-id="${esc(o.id)}">Confirm</button>
         <button class="mini" data-s="rejected" data-id="${esc(o.id)}">Reject</button>
