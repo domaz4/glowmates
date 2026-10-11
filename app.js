@@ -53,7 +53,12 @@ const I18N = {
     upload: 'Upload your payment screenshot', back: 'Back', sendOrder: 'Send order', sending: 'Sending…',
     doneH: 'Order sent', doneA: 'Order', doneB: 'We will check your payment and message you on your phone.', backBtn: 'Back to the candles',
     errShot: 'Upload your payment screenshot first.', errNoSb: 'Store is not connected yet (config.js).',
-    errUp: 'Could not upload the screenshot. Try a smaller image.', errOrder: 'Could not place the order. Check your cart and try again.'
+    errUp: 'Could not upload the screenshot. Try a smaller image.', errOrder: 'Could not place the order. Check your cart and try again.',
+    spinFab: 'Spin & Win', wheelH: 'Spin & Win', wheelSub: 'One free spin every 24 hours. Win coupons and free candles!', wheelPhone: 'Your phone number', spin: 'SPIN',
+    wheelWait: 'Next spin in', wheelNone: 'Better luck next time! Come back in 24 hours.', wheelWon: 'You won', wheelCode: 'Your code',
+    wheelApplied: 'Added to your cart. It applies at checkout.', wheelExp: 'Valid until', wheelPhoneErr: 'Enter a valid phone number.', wheelErr: 'Something went wrong. Try again.',
+    discount: 'Discount', cpnPh: 'Coupon code', cpnApply: 'Apply', cpnBad: 'Invalid or expired code.', cpnOk: 'Coupon applied',
+    freeNote: 'Your order is free. No payment needed.', errCoupon: 'That coupon is no longer valid. Try again without it.'
   },
   ar: {
     title: 'Glow Mates — شموع التدليك',
@@ -85,7 +90,12 @@ const I18N = {
     upload: 'ارفع لقطة شاشة الدفع', back: 'رجوع', sendOrder: 'إرسال الطلب', sending: 'جارٍ الإرسال…',
     doneH: 'تم إرسال الطلب', doneA: 'طلب رقم', doneB: 'سنراجع الدفع ونراسلك على هاتفك.', backBtn: 'العودة إلى الشموع',
     errShot: 'ارفع لقطة شاشة الدفع أولًا.', errNoSb: 'المتجر غير متصل بعد (config.js).',
-    errUp: 'تعذّر رفع لقطة الشاشة. جرّب صورة أصغر.', errOrder: 'تعذّر إرسال الطلب. راجع السلة وحاول مرة أخرى.'
+    errUp: 'تعذّر رفع لقطة الشاشة. جرّب صورة أصغر.', errOrder: 'تعذّر إرسال الطلب. راجع السلة وحاول مرة أخرى.',
+    spinFab: 'لفّ واربح', wheelH: 'لفّ واربح', wheelSub: 'لفّة مجانية كل 24 ساعة. اربح كوبونات وشموع مجانية!', wheelPhone: 'رقم هاتفك', spin: 'لفّ',
+    wheelWait: 'اللفّة القادمة بعد', wheelNone: 'حظ أوفر المرة القادمة! عد بعد 24 ساعة.', wheelWon: 'ربحت', wheelCode: 'الكود الخاص بك',
+    wheelApplied: 'تمت إضافته إلى سلتك ويُطبَّق عند إتمام الطلب.', wheelExp: 'صالح حتى', wheelPhoneErr: 'أدخل رقم هاتف صحيح.', wheelErr: 'حدث خطأ. حاول مرة أخرى.',
+    discount: 'الخصم', cpnPh: 'كود الخصم', cpnApply: 'تطبيق', cpnBad: 'الكود غير صالح أو منتهي.', cpnOk: 'تم تطبيق الكوبون',
+    freeNote: 'طلبك مجاني. لا حاجة للدفع.', errCoupon: 'هذا الكوبون لم يعد صالحًا. حاول مرة أخرى بدونه.'
   }
 };
 let LANG = 'en';
@@ -186,11 +196,47 @@ function addLine(id, qty, note) {
   if (ex) ex.qty = Math.min(50, ex.qty + qty); else cart.push({ id, qty, note });
   save();
 }
-const total = () => cart.reduce((s, l) => s + PRODUCTS[l.id].price * l.qty, 0);
+/* ---------- coupon ---------- */
+let coupon = null;
+try { coupon = JSON.parse(localStorage.getItem('gm_cpn') || 'null'); } catch { }
+function saveCoupon() { try { coupon ? localStorage.setItem('gm_cpn', JSON.stringify(coupon)) : localStorage.removeItem('gm_cpn'); } catch { } }
+const subtotal = () => cart.reduce((s, l) => s + PRODUCTS[l.id].price * l.qty, 0);
+function discount() {
+  if (!coupon || !cart.length) return 0;
+  const sub = subtotal();
+  if (coupon.kind === 'percent') return Math.floor(sub * coupon.value / 100);
+  if (coupon.kind === 'amount') return Math.min(coupon.value, sub);
+  if (coupon.kind === 'free_candle') return Math.min(...cart.map(l => PRODUCTS[l.id].price));
+  return 0;
+}
+const total = () => Math.max(0, subtotal() - discount());
+function renderCoupon() {
+  const has = !!coupon;
+  $('#cpnForm').hidden = has; $('#cpnChip').hidden = !has;
+  if (has) $('#cpnTxt').textContent = coupon.code + ' · ' + (LANG === 'ar' ? coupon.label_ar : coupon.label_en);
+  const d = discount();
+  $('#discRow').hidden = !d; $('#discVal').textContent = '− ' + d + ' ' + t('egp');
+}
+async function applyCoupon(code, quiet) {
+  code = String(code || '').trim().toUpperCase();
+  if (!code || !SB) return false;
+  try {
+    const r = await rpc('check_coupon', { p_code: code }); const j = await r.json();
+    if (!r.ok || !j.ok) { if (!quiet) $('#cpnMsg').textContent = t('cpnBad'); return false; }
+    coupon = { code: j.code, kind: j.kind, value: j.value, label_en: j.label_en, label_ar: j.label_ar };
+    saveCoupon(); $('#cpnMsg').textContent = ''; $('#cpnIn').value = ''; renderCart();
+    if (!quiet) toast(t('cpnOk'));
+    return true;
+  } catch { return false; }
+}
+$('#cpnApply').onclick = () => applyCoupon($('#cpnIn').value);
+$('#cpnIn').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); applyCoupon(e.target.value); } });
+$('#cpnRm').onclick = () => { coupon = null; saveCoupon(); renderCart(); };
 function renderCart() {
   $('#cartCount').textContent = cart.reduce((s, l) => s + l.qty, 0);
   $('#cartTotal').textContent = total() + ' ' + t('egp');
   $('#checkoutBtn').disabled = !cart.length;
+  renderCoupon();
   const box = $('#lines');
   if (!cart.length) { box.innerHTML = `<p class="empty">${esc(t('empty'))}</p>`; return; }
   box.innerHTML = cart.map((l, i) => `
@@ -238,8 +284,12 @@ $('#step1').onsubmit = e => {
   e.preventDefault();
   details = Object.fromEntries(new FormData(e.target));
   $('#paySummary').innerHTML = cart.map(l => `<div><span>${l.qty} × ${esc(pname(l.id))}${l.note ? `<small>${esc(l.note)}</small>` : ''}</span><b>${PRODUCTS[l.id].price * l.qty}</b></div>`).join('');
+  if (discount()) $('#paySummary').innerHTML += `<div><span>${esc(t('discount'))} (${esc(coupon.code)})</span><b>− ${discount()}</b></div>`;
   $('#payTotal').textContent = total() + ' ' + t('egp');
   $('#instaAddr').textContent = INSTAPAY;
+  const free = total() === 0;
+  $('.insta').hidden = free; $('label.file').hidden = free; $('#shot').required = !free; $('#freeNote').hidden = !free;
+  if (free) $('#shotPrev').hidden = true;
   $('#step1').hidden = true; $('#step2').hidden = false; $('#err').textContent = '';
   $('#s1').className = ''; $('#s2').className = 'on';
 };
@@ -252,18 +302,26 @@ $('#shot').onchange = e => {
 };
 $('#step2').onsubmit = async e => {
   e.preventDefault();
+  const free = total() === 0;
   const f = $('#shot').files[0];
-  if (!f) { $('#err').textContent = t('errShot'); return; }
+  if (!f && !free) { $('#err').textContent = t('errShot'); return; }
   if (!SB) { $('#err').textContent = t('errNoSb'); return; }
   const btn = $('#send'); btn.disabled = true; btn.textContent = t('sending'); $('#err').textContent = '';
   try {
-    const ext = (f.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5) || 'jpg';
-    const file = [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('') + '.' + ext;
-    const up = await fetch(SB + '/storage/v1/object/proofs/' + file, { method: 'POST', headers: sbHead({ 'Content-Type': f.type || 'image/jpeg' }), body: f });
-    if (!up.ok) throw new Error(t('errUp'));
-    const r = await rpc('place_order', { p_name: details.name, p_phone: details.phone, p_address: details.address, p_items: cart, p_shot: file });
+    let file = 'free-order';
+    if (!free) {
+      const ext = (f.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5) || 'jpg';
+      file = [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('') + '.' + ext;
+      const up = await fetch(SB + '/storage/v1/object/proofs/' + file, { method: 'POST', headers: sbHead({ 'Content-Type': f.type || 'image/jpeg' }), body: f });
+      if (!up.ok) throw new Error(t('errUp'));
+    }
+    const r = await rpc('place_order', { p_name: details.name, p_phone: details.phone, p_address: details.address, p_items: cart, p_shot: file, p_coupon: coupon ? coupon.code : null });
     const j = await r.json();
-    if (!r.ok) throw new Error(t('errOrder'));
+    if (!r.ok) {
+      if (/coupon/i.test(JSON.stringify(j))) { coupon = null; saveCoupon(); renderCart(); throw new Error(t('errCoupon')); }
+      throw new Error(t('errOrder'));
+    }
+    coupon = null; saveCoupon();
     cart = []; save(); e.target.reset(); $('#step1').reset(); $('#shotPrev').hidden = true;
     $('#step2').hidden = true; $('.steps').hidden = true; $('#done').hidden = false; $('#doneId').textContent = j.id; setTimeout(burst, 150);
   } catch (er) { $('#err').textContent = er.message; }
