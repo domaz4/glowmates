@@ -7,84 +7,24 @@
 <title>Glow Mates — Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=17">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=8">
 <style>
-  body{background:#120907;color:#f6e3d3}
-  body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(60% 40% at 15% 0%,rgba(255,154,60,.22),transparent 70%),radial-gradient(50% 40% at 100% 100%,rgba(244,185,190,.12),transparent 70%)}
-  .admin-page{position:relative;max-width:1000px;margin:0 auto;min-height:100svh;padding:28px clamp(14px,4vw,40px) 60px}
-  .admin-top{display:flex;justify-content:space-between;align-items:center;margin:0 auto 24px}
-  .admin-top a{font:400 1.9rem var(--serif);color:#fff2e4;text-decoration:none;text-shadow:0 0 24px rgba(255,154,60,.6)}
-  .admin-top span{font-weight:800;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:#ffb36b;border:1px solid rgba(255,154,60,.4);border-radius:999px;padding:5px 14px;background:rgba(255,154,60,.08)}
-
-  .admin-page .card{margin:0 auto 22px;transform:none;max-height:none;overflow:visible;background:rgba(255,247,239,.05);color:#f6e3d3;border:1px solid rgba(255,154,60,.16);box-shadow:0 30px 60px -30px rgba(0,0,0,.8);backdrop-filter:blur(12px)}
-  .admin-page .wide-card{width:100%}
-  .admin-page .card h3{margin-bottom:6px;color:#fff2e4}
-  .admin-page #login input{background:rgba(255,255,255,.08);border:1px solid rgba(255,154,60,.35);color:#fff2e4}
-  .admin-page .err{color:#ff8a80}
-  .admin-page .btn{background:linear-gradient(135deg,#ff9a3c,#ff6a3d);color:#2a1008;box-shadow:0 12px 30px -12px rgba(255,120,50,.9)}
-  .admin-page .mini{background:rgba(255,255,255,.07);color:#f6e3d3;border:1px solid rgba(255,255,255,.14);transition:background .2s,box-shadow .2s,transform .2s}
-  .admin-page .mini:hover{background:rgba(255,154,60,.18);box-shadow:0 0 18px -4px rgba(255,154,60,.7);transform:translateY(-1px)}
-  .toast{background:#ff9a3c;color:#2a1008}
-
-  /* stock */
-  .stock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:10px}
-  .sc{position:relative;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1);transition:transform .3s,box-shadow .3s,border-color .3s}
-  .sc:hover{transform:translateY(-3px);box-shadow:0 22px 40px -22px var(--tone)}
-  .sc.out{border-color:rgba(255,70,70,.6);box-shadow:0 0 0 1px rgba(255,70,70,.25),0 0 44px -10px rgba(255,60,60,.6)}
-  .sc-img{position:relative;aspect-ratio:16/10;overflow:hidden}
-  .sc-img img{width:100%;height:100%;object-fit:cover;transition:filter .4s}
-  .sc-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(18,9,7,.96))}
-  .sc.out .sc-img img{filter:grayscale(1) brightness(.5)}
-  .dot{position:absolute;right:12px;top:12px;z-index:2;width:12px;height:12px;border-radius:50%;background:#7cff9b;box-shadow:0 0 14px 4px rgba(124,255,155,.65);animation:blink 2s ease-in-out infinite}
-  .sc.low .dot{background:#ffc247;box-shadow:0 0 14px 4px rgba(255,194,71,.65)}
-  .sc.out .dot{background:#ff4d4d;box-shadow:0 0 16px 5px rgba(255,77,77,.8);animation:none}
-  .sc.na .dot{background:#888;box-shadow:none;animation:none}
-  @keyframes blink{50%{opacity:.35}}
-  .sc-body{padding:0 16px 16px;margin-top:-34px;position:relative;z-index:2}
-  .sc-body h4{font:400 1.6rem/1.1 var(--serif);color:#fff2e4;margin-bottom:8px}
-  .pill{display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:4px 12px;border-radius:999px}
-  .pill.ok{background:rgba(124,255,155,.15);color:#8dffa9;border:1px solid rgba(124,255,155,.4)}
-  .pill.low{background:rgba(255,194,71,.15);color:#ffd36e;border:1px solid rgba(255,194,71,.45)}
-  .pill.out{background:#d62828;color:#fff;box-shadow:0 0 18px -2px rgba(255,60,60,.9)}
-  .pill.na{background:rgba(255,255,255,.08);color:#aaa}
-  .sc-qty{display:flex;align-items:center;justify-content:space-between;margin:14px 0 10px}
-  .sc-qty output{font:400 2.8rem/1 var(--serif);color:#fff2e4;min-width:2ch;text-align:center}
-  .sc.out .sc-qty output{color:#ff8a80}
-  .sc-qty button{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,154,60,.45);background:rgba(255,154,60,.1);color:#ffb36b;font-size:1.4rem;font-weight:700;line-height:1;transition:transform .15s,background .2s,box-shadow .2s}
-  .sc-qty button:hover{background:rgba(255,154,60,.28);box-shadow:0 0 18px -3px rgba(255,154,60,.8)}
-  .sc-qty button:active{transform:scale(.9)}
-  .sc-set{display:flex;gap:8px}
-  .sc-set input{margin:0;padding:9px 12px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.25);color:#fff2e4;min-width:0}
-  .sc-set .mini{flex:none}
-  .hint{background:rgba(255,70,70,.12);border:1px solid rgba(255,70,70,.45);border-radius:12px;padding:12px 14px;margin:6px 0 4px;font-size:.9rem}
-
-  /* orders */
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0 16px}
-  .stat{border-radius:14px;padding:12px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
-  .stat b{display:block;font:400 2.3rem/1 var(--serif);color:#fff2e4}
-  .stat small{font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.65}
-  .stat.p b{color:#ffd36e}.stat.c b{color:#8dffa9}.stat.d b{color:#9cc8ff}
-  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-  .chip{border:1px solid rgba(255,255,255,.16);background:transparent;color:#f6e3d3;border-radius:999px;padding:6px 16px;font-weight:700;font-size:.82rem;transition:background .2s,box-shadow .2s}
-  .chip:hover{background:rgba(255,255,255,.08)}
-  .chip.on{background:#ff9a3c;border-color:#ff9a3c;color:#2a1008;box-shadow:0 0 20px -4px rgba(255,154,60,.9)}
-  .admin-page .order{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.1);border-radius:16px;transition:border-color .3s,box-shadow .3s}
-  .admin-page .order:hover{border-color:rgba(255,154,60,.35);box-shadow:0 18px 40px -26px rgba(255,154,60,.7)}
-  .admin-page .order h4{color:#fff2e4}
-  .admin-page .order a{color:#ffb36b}
-  .admin-page .badge{color:#2a1710;margin-inline-start:6px}
-  .admin-page .badge.pending{box-shadow:0 0 14px -2px rgba(255,200,80,.7)}
-  .admin-page .badge.confirmed{box-shadow:0 0 14px -2px rgba(124,255,155,.7)}
-  .admin-page .badge.rejected{box-shadow:0 0 14px -2px rgba(255,100,90,.7)}
-  .admin-page .badge.delivered{box-shadow:0 0 14px -2px rgba(130,180,255,.7)}
-  .mini[data-s=confirmed]{border-color:rgba(124,255,155,.5);color:#8dffa9}
-  .mini[data-s=rejected]{border-color:rgba(255,100,90,.5);color:#ff9a92}
-  .mini[data-s=delivered]{border-color:rgba(130,180,255,.5);color:#a9cfff}
-  .mini[data-s=pending]{border-color:rgba(255,200,80,.5);color:#ffd36e}
-  .mini[data-del]{margin-inline-start:auto;opacity:.7}
-  .empty{opacity:.7}
-  @media (max-width:720px){.stock-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}.stat{padding:10px 12px}.stat b{font-size:1.9rem}}
+  .admin-page{min-height:100svh;padding:28px clamp(14px,4vw,40px) 60px}
+  .admin-top{display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto 22px}
+  .admin-top a{font:400 1.7rem var(--serif);color:var(--ink);text-decoration:none}
+  .admin-top span{font-weight:700;opacity:.6}
+  .admin-page .card{margin:0 auto;transform:none}
+  .admin-page .card h3{margin-bottom:6px}
+  .stock-list{margin-bottom:22px}
+  .srow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1.5px solid #e3cdb9;border-radius:14px;padding:12px 16px;margin-bottom:10px}
+  .srow.out{border-color:#d62828}
+  .srow h4{font:400 1.4rem var(--serif);margin-right:auto}
+  .badge.out{background:#d62828;color:#fff}
+  .srow output{font:400 1.6rem var(--serif);min-width:2ch;text-align:center}
+  .srow .set{display:flex;gap:6px;align-items:center}
+  .srow .set input{width:90px;margin:0;padding:6px 10px;border-width:1.5px}
+  .hint{background:#f5b9b4;border-radius:10px;padding:10px 14px;font-size:.9rem;margin-bottom:12px}
 </style>
 </head>
 <body>
@@ -100,19 +40,12 @@
     </form>
   </div>
 
-  <div id="panel" hidden>
-    <div class="card wide-card">
-      <div class="p-head"><h3>Stock</h3><button id="refresh" class="mini">Refresh</button><button id="logout" class="mini">Log out</button></div>
-      <p id="stockHint" class="hint" hidden>Stock isn't set up yet. Run <b>stock.sql</b> once in the Supabase SQL Editor, then press Refresh.</p>
-      <div id="stock" class="stock-grid"></div>
-    </div>
-
-    <div class="card wide-card">
-      <div class="p-head"><h3>Orders</h3></div>
-      <div id="stats" class="stats"></div>
-      <div id="filters" class="chips"></div>
-      <div id="orders"></div>
-    </div>
+  <div class="card wide-card" id="panel" hidden>
+    <div class="p-head"><h3>Stock</h3><button id="refresh" class="mini">Refresh</button><button id="logout" class="mini">Log out</button></div>
+    <p id="stockHint" class="hint" hidden>Stock isn't set up yet. Run stock.sql once in the Supabase SQL Editor, then press Refresh.</p>
+    <div id="stock" class="stock-list"></div>
+    <div class="p-head"><h3>Orders</h3></div>
+    <div id="orders"></div>
   </div>
 </div>
 <div class="toast" id="toast" role="status"></div>
