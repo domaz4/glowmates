@@ -9,7 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <script>try{if(localStorage.getItem("gm_lang")==="ar"){document.documentElement.lang="ar";document.documentElement.dir="rtl"}}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=13">
+<script>window.gmFb=function(i){var p=i.getAttribute("data-alt");if(p&&!i.dataset.t){i.dataset.t=1;i.src=p}else{i.remove()}}</script>
+<link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
 
@@ -76,11 +77,11 @@
   <div class="shop-in">
     <h2 class="split" data-i18n="reviewsH">Customer reviews</h2>
     <div class="rev-box">
-      <img src="images/1.jpeg" alt="Customer review 1" loading="lazy" onerror="this.remove()">
-      <img src="images/2.jpeg" alt="Customer review 2" loading="lazy" onerror="this.remove()">
-      <img src="images/3.jpeg" alt="Customer review 3" loading="lazy" onerror="this.remove()">
-      <img src="images/4.jpeg" alt="Customer review 4" loading="lazy" onerror="this.remove()">
-      <img src="images/5.jpeg" alt="Customer review 5" loading="lazy" onerror="this.remove()">
+      <img src="images/1.jpeg" data-alt="1.jpeg" alt="Customer review 1" loading="lazy" onerror="gmFb(this)">
+      <img src="images/2.jpeg" data-alt="2.jpeg" alt="Customer review 2" loading="lazy" onerror="gmFb(this)">
+      <img src="images/3.jpeg" data-alt="3.jpeg" alt="Customer review 3" loading="lazy" onerror="gmFb(this)">
+      <img src="images/4.jpeg" data-alt="4.jpeg" alt="Customer review 4" loading="lazy" onerror="gmFb(this)">
+      <img src="images/5.jpeg" data-alt="5.jpeg" alt="Customer review 5" loading="lazy" onerror="gmFb(this)">
     </div>
   </div>
 </section>
@@ -191,7 +192,7 @@
 <div id="adPop" class="modal" aria-hidden="true">
   <div class="card ad-card">
     <button class="x" data-close data-i18n-aria="close" aria-label="Close">×</button>
-    <img src="images/Glowmates%20Coming%20Soon%20Teaser.png" alt="Glowmates - Coming Soon">
+    <img src="images/Glowmates%20Coming%20Soon%20Teaser.png" data-alt="images/teaser.png" alt="Glowmates - Coming Soon" onerror="gmFb(this)">
   </div>
 </div>
 
@@ -209,6 +210,6 @@
 
 <div id="toast" class="toast" role="status"></div>
 <script src="config.js?v=3"></script>
-<script src="app.js?v=13"></script>
+<script src="app.js?v=14"></script>
 </body>
 </html>
