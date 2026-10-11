@@ -23,7 +23,7 @@ const I18N = {
   en: {
     title: 'Glow Mates — Massage Candles',
     desc: 'Soy wax massage candles. Melt, massage, relax. Creamy Dunes, Sea Yeah, Sakura Whisper.',
-    cart: 'Cart', openCart: 'Open cart', close: 'Close', less: 'Less', more: 'More', jar: 'Light the candle',
+    sound: 'Ambient sound', cart: 'Cart', openCart: 'Open cart', close: 'Close', less: 'Less', more: 'More', jar: 'Light the candle',
     tag: 'Soy wax candles that melt into warm massage oil.', pick: 'Pick your scent',
     melt: 'Melt.', massage: 'Massage.', relax: 'Relax.',
     'creamy.name': 'Creamy Dunes', 'creamy.scent': 'Coconut, vanilla bean',
@@ -55,7 +55,7 @@ const I18N = {
   ar: {
     title: 'Glow Mates — شموع التدليك',
     desc: 'شموع تدليك من شمع الصويا. ذوّب، دلّك، استرخِ. كريمي ديونز، سي ياه، ساكورا ويسبر.',
-    cart: 'السلة', openCart: 'افتح السلة', close: 'إغلاق', less: 'أقل', more: 'أكثر', jar: 'أشعل الشمعة',
+    sound: 'الصوت', cart: 'السلة', openCart: 'افتح السلة', close: 'إغلاق', less: 'أقل', more: 'أكثر', jar: 'أشعل الشمعة',
     tag: 'شموع صويا تتحول إلى زيت تدليك دافئ.', pick: 'اختر رائحتك',
     melt: 'ذوّب.', massage: 'دلّك.', relax: 'استرخِ.',
     'creamy.name': 'كريمي ديونز', 'creamy.scent': 'جوز الهند، حبوب الفانيليا',
@@ -109,6 +109,7 @@ function setLang(l, persist = true) {
   $('.track').innerHTML = Array(4).fill([D.melt, D.massage, D.relax]).flat().map(w => `<span>${esc(w)}</span>`).join('');
   $$('.product').forEach(sec => { $('.price', sec).textContent = PRODUCTS[sec.dataset.id].price + ' ' + D.egp; });
   $('#langBtn').textContent = l === 'ar' ? 'English' : 'العربية';
+  renderSoundBtn();
   document.title = D.title; $('meta[name=description]').content = D.desc;
   if (!$('#jar').classList.contains('lit')) $('#lstate').textContent = D.unlit;
   $('#cartTotal').textContent = total() + ' ' + D.egp;
@@ -294,6 +295,49 @@ $('#orders').addEventListener('click', async e => {
   else if (b.dataset.del) { if (!confirm('Delete this order?')) return; await rpc('admin_delete', { p_pw: adminPw, p_id: b.dataset.del }); }
   loadOrders();
 });
+
+/* ---------- ambient sound per candle ---------- */
+const SND = { creamy: 'audio/dune.mp3', sea: 'audio/sea.mp3', sakura: 'audio/sakura.mp3' };
+const SND_VOL = .6;
+const aud = {}; let soundOn = false, curSnd = null, fading = false;
+Object.entries(SND).forEach(([id, src]) => { const a = new Audio(src); a.loop = true; a.preload = 'none'; a.volume = 0; aud[id] = a; a.addEventListener('ended', () => { a.currentTime = 0; if (soundOn && curSnd === id) a.play().catch(() => { }); }); });
+function renderSoundBtn() {
+  const b = $('#soundBtn'); if (!b) return;
+  b.textContent = soundOn ? '🔊' : '🔇'; b.setAttribute('aria-pressed', soundOn); b.setAttribute('aria-label', t('sound')); b.title = t('sound');
+}
+function fadeStep() {
+  let busy = false;
+  for (const id in aud) {
+    const a = aud[id], target = soundOn && curSnd === id ? SND_VOL : 0, d = target - a.volume;
+    if (Math.abs(d) > .015) { a.volume = Math.max(0, Math.min(1, a.volume + Math.sign(d) * .015)); busy = true; }
+    else a.volume = target;
+    if (target === 0 && a.volume === 0 && !a.paused) a.pause();
+  }
+  if (busy) requestAnimationFrame(fadeStep); else fading = false;
+}
+function updateSound() {
+  for (const id in aud) { if (soundOn && curSnd === id && aud[id].paused) aud[id].play().catch(() => { }); }
+  if (!fading) { fading = true; requestAnimationFrame(fadeStep); }
+}
+function setSound(on, persist = true) {
+  soundOn = on; renderSoundBtn(); $('#soundBtn').classList.remove('pulse');
+  if (persist) { try { localStorage.setItem('gm_sound', on ? 'on' : 'off'); } catch { } }
+  updateSound();
+}
+$('#soundBtn').onclick = () => setSound(!soundOn);
+const sndIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { curSnd = e.target.dataset.id || null; updateSound(); } }), { rootMargin: '-50% 0px -50% 0px' });
+$$('.product').forEach(el => sndIO.observe(el));
+const quietIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { curSnd = null; updateSound(); } }), { rootMargin: '-50% 0px -50% 0px' });
+$$('#hero,#light,.how,.foot').forEach(el => quietIO.observe(el));
+document.addEventListener('visibilitychange', () => { if (document.hidden) Object.values(aud).forEach(a => a.pause()); else updateSound(); });
+{
+  let pref = null; try { pref = localStorage.getItem('gm_sound'); } catch { }
+  if (pref === 'on') {
+    // browsers only allow audio after a tap/click, so start on the first one
+    const arm = () => { removeEventListener('pointerdown', arm); removeEventListener('keydown', arm); setSound(true, false); };
+    addEventListener('pointerdown', arm); addEventListener('keydown', arm);
+  } else $('#soundBtn').classList.add('pulse');
+}
 
 {
   let saved = null; try { saved = localStorage.getItem('gm_lang'); } catch { }
