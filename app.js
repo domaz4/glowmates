@@ -297,7 +297,7 @@ $('#orders').addEventListener('click', async e => {
 });
 
 /* ---------- ambient sound per candle ---------- */
-const SND = { creamy: 'audio/dune.mp3', sea: 'audio/sea.mp3', sakura: 'audio/sakura.mp3' };
+const SND = { creamy: 'dunes.mp3', sea: 'sea.mp3', sakura: 'sakura.mp3' };
 const SND_VOL = .6;
 const aud = {}; let soundOn = false, curSnd = null, fading = false;
 Object.entries(SND).forEach(([id, src]) => { const a = new Audio(src); a.loop = true; a.preload = 'none'; a.volume = 0; aud[id] = a; a.addEventListener('ended', () => { a.currentTime = 0; if (soundOn && curSnd === id) a.play().catch(() => { }); }); });
