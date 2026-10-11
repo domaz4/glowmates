@@ -164,6 +164,19 @@ $('#qvAdd').onclick = e => {
   fly(e.currentTarget); toast(t('added')(pname(qvId))); openModal($('#quick'), false);
 };
 new MutationObserver(() => { if (!$('#quick').classList.contains('on')) { qvId = null; curSnd = null; updateSound(); } }).observe($('#quick'), { attributes: true, attributeFilter: ['class'] });
+/* ---------- reviews: looks for 1-5 (.jpeg/.jpg/.png) in /images, then in the main folder ---------- */
+(() => {
+  const box = $('.rev-box'); let ok = 0, done = 0;
+  const finish = () => { if (++done === 5 && !ok) $('#reviews').hidden = true; };
+  for (let i = 1; i <= 5; i++) {
+    const c = [`images/${i}.jpeg`, `${i}.jpeg`, `images/${i}.jpg`, `${i}.jpg`, `images/${i}.png`, `${i}.png`];
+    const im = new Image(); im.alt = 'Customer review ' + i; let k = 0;
+    im.onload = () => { ok++; finish(); };
+    im.onerror = () => { if (++k < c.length) im.src = c[k]; else { im.remove(); finish(); } };
+    im.src = c[0]; box.appendChild(im);
+  }
+})();
+
 /* ---------- review lightbox ---------- */
 $('#reviews').addEventListener('click', e => { const im = e.target.closest('.rev-box img'); if (!im) return; $('#lbImg').src = im.src; openModal($('#lightbox')); });
 $('#lightbox').addEventListener('click', () => openModal($('#lightbox'), false));
