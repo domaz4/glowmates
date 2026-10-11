@@ -14,9 +14,8 @@ const sbHead = (extra = {}) => ({ apikey: GM.SUPABASE_ANON_KEY, ...(String(GM.SU
 const rpc = (fn, body) => fetch(SB + '/rest/v1/rpc/' + fn, { method: 'POST', headers: sbHead({ 'Content-Type': 'application/json' }), body: JSON.stringify(body) });
 const proofUrl = f => SB + '/storage/v1/object/public/proofs/' + encodeURIComponent(f);
 
-/* ---------- coming soon ad (once per session) ---------- */
+/* ---------- coming soon ad (every page load) ---------- */
 function showAd(ms) {
-  try { if (sessionStorage.getItem('gm_ad')) return; sessionStorage.setItem('gm_ad', '1'); } catch { }
   setTimeout(() => openModal($('#adPop')), ms);
 }
 
