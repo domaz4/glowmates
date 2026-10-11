@@ -18,11 +18,104 @@ const proofUrl = f => SB + '/storage/v1/object/public/proofs/' + encodeURICompon
 let tt;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 2200); }
 
-/* ---------- split headlines ---------- */
-$$('.split').forEach(h => {
-  const txt = h.textContent; h.setAttribute('aria-label', txt); h.textContent = '';
-  [...txt].forEach((c, i) => { const s = document.createElement('span'); s.className = 'ch'; s.setAttribute('aria-hidden', 'true'); s.style.setProperty('--i', i); s.innerHTML = c === ' ' ? '&nbsp;' : esc(c); h.appendChild(s); });
-});
+/* ---------- language (EN / AR) ---------- */
+const I18N = {
+  en: {
+    title: 'Glow Mates — Massage Candles',
+    desc: 'Soy wax massage candles. Melt, massage, relax. Creamy Dunes, Sea Yeah, Sakura Whisper.',
+    cart: 'Cart', openCart: 'Open cart', close: 'Close', less: 'Less', more: 'More', jar: 'Light the candle',
+    tag: 'Soy wax candles that melt into warm massage oil.', pick: 'Pick your scent',
+    melt: 'Melt.', massage: 'Massage.', relax: 'Relax.',
+    'creamy.name': 'Creamy Dunes', 'creamy.scent': 'Coconut, vanilla bean',
+    'creamy.blurb': 'Warm sand, toasted coconut and soft vanilla. Light it, wait for the pool to melt, then pour it on skin.',
+    'sea.name': 'Sea Yeah', 'sea.scent': 'Mango, passion fruit, pineapple, coconut',
+    'sea.blurb': 'Sunset on a beach you wish you were on. Bright fruit up top, coconut underneath.',
+    'sakura.name': 'Sakura Whisper', 'sakura.scent': 'Cherry blossom, rose',
+    'sakura.blurb': 'Soft florals for two. The one people buy for date night.',
+    made1: 'Soy wax', made2: 'Shea butter', made3: 'Sweet almond oil', made4: 'Skin-safe fragrance',
+    noteL: 'Note for this candle', notePh: 'Gift message, wick preference, anything we should know', add: 'Add to cart',
+    lightH: 'Light it', lightP: 'Tap the wick. Watch the wax turn to warm oil.', unlit: 'Unlit',
+    states: ['Lit. Warming up…', 'Pool forming…', 'Almost ready…', 'Melted. Pour and massage.'],
+    howH: 'How it works',
+    how1b: 'Light it.', how1: 'Let the wax pool melt for 15 minutes.',
+    how2b: 'Blow it out.', how2: 'Wait a minute so it is warm, not hot.',
+    how3b: 'Pour and massage.', how3: 'The melted wax turns into a silky oil.',
+    pay: 'Order here, pay by Instapay, upload your screenshot. We confirm and deliver.',
+    foot: 'Glow Mates. Melt. Massage. Relax.',
+    cartTitle: 'Your cart', total: 'Total', checkout: 'Checkout', empty: 'Your cart is empty. Pick a candle.',
+    notePhShort: 'Note', remove: 'Remove', egp: 'EGP', added: n => `${n} added`,
+    step1: 'Delivery', step2: 'Payment', deliverH: 'Where should we deliver?',
+    fullName: 'Full name', phone: 'Phone number', address: 'Address', addrPh: 'Street, building, floor, city',
+    cont: 'Continue to payment', payH: 'Pay with Instapay', send: 'Send', to: 'to', copy: 'Copy', copied: 'Copied',
+    upload: 'Upload your payment screenshot', back: 'Back', sendOrder: 'Send order', sending: 'Sending…',
+    doneH: 'Order sent', doneA: 'Order', doneB: 'We will check your payment and message you on your phone.', backBtn: 'Back to the candles',
+    errShot: 'Upload your payment screenshot first.', errNoSb: 'Store is not connected yet (config.js).',
+    errUp: 'Could not upload the screenshot. Try a smaller image.', errOrder: 'Could not place the order. Check your cart and try again.'
+  },
+  ar: {
+    title: 'Glow Mates — شموع التدليك',
+    desc: 'شموع تدليك من شمع الصويا. ذوّب، دلّك، استرخِ. كريمي ديونز، سي ياه، ساكورا ويسبر.',
+    cart: 'السلة', openCart: 'افتح السلة', close: 'إغلاق', less: 'أقل', more: 'أكثر', jar: 'أشعل الشمعة',
+    tag: 'شموع صويا تتحول إلى زيت تدليك دافئ.', pick: 'اختر رائحتك',
+    melt: 'ذوّب.', massage: 'دلّك.', relax: 'استرخِ.',
+    'creamy.name': 'كريمي ديونز', 'creamy.scent': 'جوز الهند، حبوب الفانيليا',
+    'creamy.blurb': 'رمال دافئة وجوز هند محمّص وفانيليا ناعمة. أشعلها، انتظر حتى تذوب الشمعة، ثم اسكبها على بشرتك.',
+    'sea.name': 'سي ياه', 'sea.scent': 'مانجو، فاكهة العاطفة، أناناس، جوز الهند',
+    'sea.blurb': 'غروب الشمس على شاطئ تتمنى أن تكون فيه. فاكهة منعشة في الأعلى وجوز هند في العمق.',
+    'sakura.name': 'ساكورا ويسبر', 'sakura.scent': 'زهر الكرز، ورد',
+    'sakura.blurb': 'زهور ناعمة لشخصين. الاختيار الأول للّيالي الرومانسية.',
+    made1: 'شمع الصويا', made2: 'زبدة الشيا', made3: 'زيت اللوز الحلو', made4: 'عطر آمن للبشرة',
+    noteL: 'ملاحظة لهذه الشمعة', notePh: 'رسالة إهداء، تفضيل الفتيل، أي شيء تود إخبارنا به', add: 'أضف إلى السلة',
+    lightH: 'أشعلها', lightP: 'المس الفتيل. شاهد الشمع يتحول إلى زيت دافئ.', unlit: 'مطفأة',
+    states: ['مشتعلة. جارٍ التسخين…', 'تتكوّن البركة…', 'على وشك الجاهزية…', 'ذابت. اسكبها ودلّك.'],
+    howH: 'طريقة الاستخدام',
+    how1b: 'أشعلها.', how1: 'اترك بركة الشمع تذوب لمدة 15 دقيقة.',
+    how2b: 'أطفئها.', how2: 'انتظر دقيقة حتى تصبح دافئة وليست ساخنة.',
+    how3b: 'اسكب ودلّك.', how3: 'يتحول الشمع الذائب إلى زيت ناعم كالحرير.',
+    pay: 'اطلب من هنا، وادفع عبر إنستاباي، وارفع لقطة الشاشة. نؤكد الطلب ونوصّله لك.',
+    foot: 'Glow Mates. ذوّب. دلّك. استرخِ.',
+    cartTitle: 'سلتك', total: 'الإجمالي', checkout: 'إتمام الطلب', empty: 'سلتك فارغة. اختر شمعة.',
+    notePhShort: 'ملاحظة', remove: 'إزالة', egp: 'جنيه', added: n => `تمت إضافة ${n}`,
+    step1: 'التوصيل', step2: 'الدفع', deliverH: 'أين نوصّل طلبك؟',
+    fullName: 'الاسم بالكامل', phone: 'رقم الهاتف', address: 'العنوان', addrPh: 'الشارع، المبنى، الدور، المدينة',
+    cont: 'المتابعة إلى الدفع', payH: 'الدفع عبر إنستاباي', send: 'أرسل', to: 'إلى', copy: 'نسخ', copied: 'تم النسخ',
+    upload: 'ارفع لقطة شاشة الدفع', back: 'رجوع', sendOrder: 'إرسال الطلب', sending: 'جارٍ الإرسال…',
+    doneH: 'تم إرسال الطلب', doneA: 'طلب رقم', doneB: 'سنراجع الدفع ونراسلك على هاتفك.', backBtn: 'العودة إلى الشموع',
+    errShot: 'ارفع لقطة شاشة الدفع أولًا.', errNoSb: 'المتجر غير متصل بعد (config.js).',
+    errUp: 'تعذّر رفع لقطة الشاشة. جرّب صورة أصغر.', errOrder: 'تعذّر إرسال الطلب. راجع السلة وحاول مرة أخرى.'
+  }
+};
+let LANG = 'en';
+const t = k => I18N[LANG][k];
+const pname = id => t(id + '.name');
+
+/* headlines: letters animate one by one in English, word by word in Arabic (Arabic letters must stay joined) */
+function splitText(h, txt) {
+  h.setAttribute('aria-label', txt); h.textContent = '';
+  const ar = LANG === 'ar';
+  (ar ? txt.split(' ') : [...txt]).forEach((c, i) => {
+    const s = document.createElement('span'); s.className = 'ch'; s.setAttribute('aria-hidden', 'true');
+    s.style.setProperty('--i', ar ? i * 4 : i); s.innerHTML = c === ' ' ? '&nbsp;' : esc(c); h.appendChild(s);
+    if (ar) h.appendChild(document.createTextNode(' '));
+  });
+}
+function setLang(l, persist = true) {
+  LANG = l; const D = I18N[l], de = document.documentElement;
+  de.lang = l; de.dir = l === 'ar' ? 'rtl' : 'ltr';
+  if (persist) { try { localStorage.setItem('gm_lang', l); } catch { } }
+  $$('[data-i18n]').forEach(el => { const v = D[el.dataset.i18n]; if (v === undefined) return; el.classList.contains('split') ? splitText(el, v) : (el.textContent = v); });
+  $$('[data-i18n-ph]').forEach(el => el.placeholder = D[el.dataset.i18nPh]);
+  $$('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', D[el.dataset.i18nAria]));
+  $('.track').innerHTML = Array(4).fill([D.melt, D.massage, D.relax]).flat().map(w => `<span>${esc(w)}</span>`).join('');
+  $$('.product').forEach(sec => { $('.price', sec).textContent = PRODUCTS[sec.dataset.id].price + ' ' + D.egp; });
+  $('#langBtn').textContent = l === 'ar' ? 'English' : 'العربية';
+  document.title = D.title; $('meta[name=description]').content = D.desc;
+  if (!$('#jar').classList.contains('lit')) $('#lstate').textContent = D.unlit;
+  $('#cartTotal').textContent = total() + ' ' + D.egp;
+  renderCart();
+}
+$$('[data-lang]').forEach(b => b.onclick = () => { setLang(b.dataset.lang); openModal($('#langPick'), false); });
+$('#langBtn').onclick = () => setLang(LANG === 'ar' ? 'en' : 'ar');
 
 /* ---------- scroll theme + reveals ---------- */
 const root = document.documentElement;
@@ -52,7 +145,7 @@ $$('.product').forEach(sec => {
     const id = sec.dataset.id, qty = +out.textContent, note = $('textarea', sec).value.trim();
     addLine(id, qty, note);
     fly(e.currentTarget);
-    toast(`${PRODUCTS[id].name} added`);
+    toast(t('added')(pname(id)));
     out.textContent = 1; $('textarea', sec).value = '';
   };
 });
@@ -75,19 +168,19 @@ function addLine(id, qty, note) {
 const total = () => cart.reduce((s, l) => s + PRODUCTS[l.id].price * l.qty, 0);
 function renderCart() {
   $('#cartCount').textContent = cart.reduce((s, l) => s + l.qty, 0);
-  $('#cartTotal').textContent = total() + ' EGP';
+  $('#cartTotal').textContent = total() + ' ' + t('egp');
   $('#checkoutBtn').disabled = !cart.length;
   const box = $('#lines');
-  if (!cart.length) { box.innerHTML = '<p class="empty">Your cart is empty. Pick a candle.</p>'; return; }
+  if (!cart.length) { box.innerHTML = `<p class="empty">${esc(t('empty'))}</p>`; return; }
   box.innerHTML = cart.map((l, i) => `
     <div class="line-item">
       <img src="${IMG[l.id]}" alt="">
       <div>
-        <h4>${esc(PRODUCTS[l.id].name)}</h4>
-        <div class="qty"><button data-i="${i}" data-d="-1" aria-label="Less">−</button><output>${l.qty}</output><button data-i="${i}" data-d="1" aria-label="More">+</button></div>
-        <textarea rows="1" data-n="${i}" placeholder="Note" maxlength="300">${esc(l.note)}</textarea>
+        <h4>${esc(pname(l.id))}</h4>
+        <div class="qty"><button data-i="${i}" data-d="-1" aria-label="${esc(t('less'))}">−</button><output>${l.qty}</output><button data-i="${i}" data-d="1" aria-label="${esc(t('more'))}">+</button></div>
+        <textarea rows="1" data-n="${i}" placeholder="${esc(t('notePhShort'))}" maxlength="300">${esc(l.note)}</textarea>
       </div>
-      <div><b>${PRODUCTS[l.id].price * l.qty}</b><br><button class="rm" data-rm="${i}">Remove</button></div>
+      <div><b>${PRODUCTS[l.id].price * l.qty}</b><br><button class="rm" data-rm="${i}">${esc(t('remove'))}</button></div>
     </div>`).join('');
 }
 $('#lines').addEventListener('click', e => {
@@ -123,14 +216,14 @@ $('#checkoutBtn').onclick = () => {
 $('#step1').onsubmit = e => {
   e.preventDefault();
   details = Object.fromEntries(new FormData(e.target));
-  $('#paySummary').innerHTML = cart.map(l => `<div><span>${l.qty} × ${esc(PRODUCTS[l.id].name)}${l.note ? `<small>${esc(l.note)}</small>` : ''}</span><b>${PRODUCTS[l.id].price * l.qty}</b></div>`).join('');
-  $('#payTotal').textContent = total() + ' EGP';
+  $('#paySummary').innerHTML = cart.map(l => `<div><span>${l.qty} × ${esc(pname(l.id))}${l.note ? `<small>${esc(l.note)}</small>` : ''}</span><b>${PRODUCTS[l.id].price * l.qty}</b></div>`).join('');
+  $('#payTotal').textContent = total() + ' ' + t('egp');
   $('#instaAddr').textContent = INSTAPAY;
   $('#step1').hidden = true; $('#step2').hidden = false; $('#err').textContent = '';
   $('#s1').className = ''; $('#s2').className = 'on';
 };
 $('#back').onclick = () => { $('#step2').hidden = true; $('#step1').hidden = false; $('#s1').className = 'on'; $('#s2').className = ''; };
-$('#copyInsta').onclick = () => { navigator.clipboard?.writeText(INSTAPAY).then(() => toast('Copied')).catch(() => {}); };
+$('#copyInsta').onclick = () => { navigator.clipboard?.writeText(INSTAPAY).then(() => toast(t('copied'))).catch(() => {}); };
 $('#shot').onchange = e => {
   const f = e.target.files[0], p = $('#shotPrev');
   if (!f) { p.hidden = true; return; }
@@ -139,21 +232,21 @@ $('#shot').onchange = e => {
 $('#step2').onsubmit = async e => {
   e.preventDefault();
   const f = $('#shot').files[0];
-  if (!f) { $('#err').textContent = 'Upload your payment screenshot first.'; return; }
-  if (!SB) { $('#err').textContent = 'Store is not connected yet (config.js).'; return; }
-  const btn = $('#send'); btn.disabled = true; btn.textContent = 'Sending…'; $('#err').textContent = '';
+  if (!f) { $('#err').textContent = t('errShot'); return; }
+  if (!SB) { $('#err').textContent = t('errNoSb'); return; }
+  const btn = $('#send'); btn.disabled = true; btn.textContent = t('sending'); $('#err').textContent = '';
   try {
     const ext = (f.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5) || 'jpg';
     const file = [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('') + '.' + ext;
     const up = await fetch(SB + '/storage/v1/object/proofs/' + file, { method: 'POST', headers: sbHead({ 'Content-Type': f.type || 'image/jpeg' }), body: f });
-    if (!up.ok) throw new Error('Could not upload the screenshot. Try a smaller image.');
+    if (!up.ok) throw new Error(t('errUp'));
     const r = await rpc('place_order', { p_name: details.name, p_phone: details.phone, p_address: details.address, p_items: cart, p_shot: file });
     const j = await r.json();
-    if (!r.ok) throw new Error('Could not place the order (' + r.status + '): ' + (j.message || j.hint || j.details || 'unknown error'));
+    if (!r.ok) throw new Error(t('errOrder'));
     cart = []; save(); e.target.reset(); $('#step1').reset(); $('#shotPrev').hidden = true;
     $('#step2').hidden = true; $('.steps').hidden = true; $('#done').hidden = false; $('#doneId').textContent = j.id; setTimeout(burst, 150);
   } catch (er) { $('#err').textContent = er.message; }
-  btn.disabled = false; btn.textContent = 'Send order';
+  btn.disabled = false; btn.textContent = t('sendOrder');
 };
 
 /* ---------- admin ---------- */
@@ -202,7 +295,11 @@ $('#orders').addEventListener('click', async e => {
   loadOrders();
 });
 
-renderCart();
+{
+  let saved = null; try { saved = localStorage.getItem('gm_lang'); } catch { }
+  setLang(saved === 'ar' ? 'ar' : 'en', false);
+  if (saved !== 'ar' && saved !== 'en') openModal($('#langPick'));
+}
 
 /* ---------- extras: progress, cursor, magnetic, embers, light-it, burst ---------- */
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -242,16 +339,16 @@ if (cv && !reduce) {
 const jar = $('#jar');
 if (jar) {
   let timer, pct = 0;
-  const states = ['Lit. Warming up…', 'Pool forming…', 'Almost ready…', 'Melted. Pour and massage.'];
+  const states = () => t('states');
   jar.onclick = () => {
     const lit = !jar.classList.contains('lit');
     jar.classList.toggle('lit', lit); jar.setAttribute('aria-pressed', lit);
     clearInterval(timer);
     if (lit) {
       pct = 0;
-      timer = setInterval(() => { pct = Math.min(100, pct + 1); $('#meltfill').style.width = pct + '%'; $('#lstate').textContent = states[Math.min(3, Math.floor(pct / 34))]; if (pct >= 100) clearInterval(timer); }, 100);
-      $('#lstate').textContent = states[0];
-    } else { $('#meltfill').style.width = '0'; $('#lstate').textContent = 'Unlit'; }
+      timer = setInterval(() => { pct = Math.min(100, pct + 1); $('#meltfill').style.width = pct + '%'; $('#lstate').textContent = states()[Math.min(3, Math.floor(pct / 34))]; if (pct >= 100) clearInterval(timer); }, 100);
+      $('#lstate').textContent = states()[0];
+    } else { $('#meltfill').style.width = '0'; $('#lstate').textContent = t('unlit'); }
   };
 }
 
