@@ -271,3 +271,9 @@ html[dir=rtl] .modal .ad-card .x{left:10px;right:auto}
 .arch .slides{position:relative;width:100%;height:112%}
 .arch .slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.06);transition:opacity 1s ease,transform 3.4s ease}
 .arch .slide.on{opacity:1;transform:scale(1)}
+
+/* teaser slide: show the whole image (no cropping) on a blurred backdrop */
+.arch .slide.fit{background:#2a1710;overflow:hidden}
+.arch .slide.fit img{position:absolute;inset:0;width:100%;height:100%}
+.arch .slide.fit .bgimg{object-fit:cover;filter:blur(24px) brightness(.8);transform:scale(1.2)}
+.arch .slide.fit .fgimg{object-fit:contain;padding:6%}
