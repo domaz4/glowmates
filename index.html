@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <script>try{if(localStorage.getItem("gm_lang")==="ar"){document.documentElement.lang="ar";document.documentElement.dir="rtl"}}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
 
@@ -65,6 +65,19 @@
       </div>
       <div class="pinfo"><p class="pscent" data-i18n="sakura.scent">Cherry blossom, rose</p><h3 class="pname" data-i18n="sakura.name">Sakura Whisper</h3><p class="price" data-price="sakura">300 EGP</p></div>
     </article>
+    </div>
+  </div>
+</section>
+
+<section id="reviews" class="sec reviews" data-bg="#F1DDC8" data-ink="#2a1710">
+  <div class="shop-in">
+    <h2 class="split" data-i18n="reviewsH">Customer reviews</h2>
+    <div class="rev-box">
+      <img src="images/1.jpeg" alt="Customer review 1" loading="lazy" onerror="this.remove()">
+      <img src="images/2.jpeg" alt="Customer review 2" loading="lazy" onerror="this.remove()">
+      <img src="images/3.jpeg" alt="Customer review 3" loading="lazy" onerror="this.remove()">
+      <img src="images/4.jpeg" alt="Customer review 4" loading="lazy" onerror="this.remove()">
+      <img src="images/5.jpeg" alt="Customer review 5" loading="lazy" onerror="this.remove()">
     </div>
   </div>
 </section>
@@ -168,6 +181,9 @@
   </div>
 </div>
 
+<!-- review lightbox -->
+<div id="lightbox" class="modal" aria-hidden="true"><img id="lbImg" alt=""></div>
+
 <!-- language picker -->
 <div id="langPick" class="modal" aria-hidden="true">
   <div class="card">
@@ -182,6 +198,6 @@
 
 <div id="toast" class="toast" role="status"></div>
 <script src="config.js?v=3"></script>
-<script src="app.js?v=10"></script>
+<script src="app.js?v=11"></script>
 </body>
 </html>
