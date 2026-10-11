@@ -260,3 +260,9 @@ html[lang=ar] .reviews h2{line-height:1.3;letter-spacing:0}
 .rev-box img:hover{transform:scale(1.02)}
 #lightbox{cursor:zoom-out;z-index:65}
 #lightbox img{max-width:min(94vw,900px);max-height:90svh;border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+
+/* ---- coming soon ad ---- */
+.ad-card{padding:0;width:min(520px,100%);background:#000;overflow:hidden;line-height:0}
+.ad-card img{width:100%;height:auto;display:block}
+.ad-card .x{color:#fff;background:rgba(0,0,0,.45);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:1.6rem;z-index:2;top:10px;right:10px}
+html[dir=rtl] .modal .ad-card .x{left:10px;right:auto}
