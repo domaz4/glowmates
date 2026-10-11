@@ -2,7 +2,7 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const IMG = { creamy: 'images/creamy.jpg', sea: 'images/sea.jpg', sakura: 'images/sakura.jpg' };
-let PRODUCTS = { creamy: { name: 'Creamy Dunes', price: 300 }, sea: { name: 'Sea Yeah', price: 300 }, sakura: { name: 'Sakura Whisper', price: 300 } };
+let PRODUCTS = { creamy: { name: 'Creamy Dunes', price: 295 }, sea: { name: 'Sea Yeah', price: 290 }, sakura: { name: 'Sakura Whisper', price: 300 } };
 let INSTAPAY = '';
 let cart = [];
 try { cart = JSON.parse(localStorage.getItem('gm_cart') || '[]').filter(l => PRODUCTS[l.id]); } catch { cart = []; }
@@ -23,7 +23,7 @@ const I18N = {
   en: {
     title: 'Glow Mates — Massage Candles',
     desc: 'Soy wax massage candles. Melt, massage, relax. Creamy Dunes, Sea Yeah, Sakura Whisper.',
-    sound: 'Ambient sound', tapSound: 'Tap anywhere to turn on the sound 🔊', cart: 'Cart', openCart: 'Open cart', close: 'Close', less: 'Less', more: 'More', jar: 'Light the candle',
+    sound: 'Ambient sound', tapSound: 'Tap anywhere to turn on the sound 🔊', shopH: 'Our candles', view: 'Quick view', cart: 'Cart', openCart: 'Open cart', close: 'Close', less: 'Less', more: 'More', jar: 'Light the candle',
     tag: 'Soy wax candles that melt into warm massage oil.', pick: 'Pick your scent',
     melt: 'Melt.', massage: 'Massage.', relax: 'Relax.',
     'creamy.name': 'Creamy Dunes', 'creamy.scent': 'Coconut, vanilla bean',
@@ -55,7 +55,7 @@ const I18N = {
   ar: {
     title: 'Glow Mates — شموع التدليك',
     desc: 'شموع تدليك من شمع الصويا. ذوّب، دلّك، استرخِ. كريمي ديونز، سي ياه، ساكورا ويسبر.',
-    sound: 'الصوت', tapSound: 'المس الشاشة لتشغيل الصوت 🔊', cart: 'السلة', openCart: 'افتح السلة', close: 'إغلاق', less: 'أقل', more: 'أكثر', jar: 'أشعل الشمعة',
+    sound: 'الصوت', tapSound: 'المس الشاشة لتشغيل الصوت 🔊', shopH: 'شموعنا', view: 'نظرة سريعة', cart: 'السلة', openCart: 'افتح السلة', close: 'إغلاق', less: 'أقل', more: 'أكثر', jar: 'أشعل الشمعة',
     tag: 'شموع صويا تتحول إلى زيت تدليك دافئ.', pick: 'اختر رائحتك',
     melt: 'ذوّب.', massage: 'دلّك.', relax: 'استرخِ.',
     'creamy.name': 'كريمي ديونز', 'creamy.scent': 'جوز الهند، حبوب الفانيليا',
@@ -107,7 +107,8 @@ function setLang(l, persist = true) {
   $$('[data-i18n-ph]').forEach(el => el.placeholder = D[el.dataset.i18nPh]);
   $$('[data-i18n-aria]').forEach(el => el.setAttribute('aria-label', D[el.dataset.i18nAria]));
   $('.track').innerHTML = Array(4).fill([D.melt, D.massage, D.relax]).flat().map(w => `<span>${esc(w)}</span>`).join('');
-  $$('.product').forEach(sec => { $('.price', sec).textContent = PRODUCTS[sec.dataset.id].price + ' ' + D.egp; });
+  $$('[data-price]').forEach(el => { el.textContent = PRODUCTS[el.dataset.price].price + ' ' + D.egp; });
+  fillQuick();
   $('#langBtn').textContent = l === 'ar' ? 'English' : 'العربية';
   renderSoundBtn();
   document.title = D.title; $('meta[name=description]').content = D.desc;
@@ -138,18 +139,31 @@ $$('.p-img').forEach(el => {
   el.addEventListener('pointerleave', () => { el.style.setProperty('--ry', '0deg'); el.style.setProperty('--rx', '0deg'); });
 });
 
-/* ---------- product controls ---------- */
-$$('.product').forEach(sec => {
-  const out = $('output', sec);
-  $$('.qty button', sec).forEach(b => b.onclick = () => { out.textContent = Math.max(1, Math.min(50, +out.textContent + +b.dataset.q)); });
-  $('.add', sec).onclick = e => {
-    const id = sec.dataset.id, qty = +out.textContent, note = $('textarea', sec).value.trim();
-    addLine(id, qty, note);
-    fly(e.currentTarget);
-    toast(t('added')(pname(id)));
-    out.textContent = 1; $('textarea', sec).value = '';
-  };
+/* ---------- shop grid + quick view ---------- */
+const TONE = { creamy: ['#E9CFA0', '#3a2410'], sea: ['#F49A6B', '#3b1608'], sakura: ['#F4B9BE', '#3a1420'] };
+let qvId = null;
+function fillQuick() {
+  if (!qvId) return;
+  const card = $('#quick .card'); card.style.background = TONE[qvId][0]; card.style.color = TONE[qvId][1];
+  $('#qvImg').src = IMG[qvId]; $('#qvImg').alt = pname(qvId);
+  $('#qvScent').textContent = t(qvId + '.scent'); $('#qvName').textContent = pname(qvId); $('#qvBlurb').textContent = t(qvId + '.blurb');
+  $('#qvPrice').textContent = PRODUCTS[qvId].price + ' ' + t('egp');
+}
+function openQuick(id) {
+  qvId = id; $('#qvQty').textContent = 1; $('#qvNote').value = '';
+  fillQuick(); openModal($('#quick')); curSnd = id; updateSound();   // the candle's sound plays while its quick view is open
+}
+$('#shop').addEventListener('click', e => {
+  const card = e.target.closest('.pcard'); if (!card) return;
+  const id = card.dataset.id, qa = e.target.closest('.qa');
+  if (qa) { addLine(id, 1, ''); fly(qa); toast(t('added')(pname(id))); } else openQuick(id);
 });
+$$('#quick .qty button').forEach(b => b.onclick = () => { const o = $('#qvQty'); o.textContent = Math.max(1, Math.min(50, +o.textContent + +b.dataset.q)); });
+$('#qvAdd').onclick = e => {
+  addLine(qvId, +$('#qvQty').textContent, $('#qvNote').value.trim());
+  fly(e.currentTarget); toast(t('added')(pname(qvId))); openModal($('#quick'), false);
+};
+new MutationObserver(() => { if (!$('#quick').classList.contains('on')) { qvId = null; curSnd = null; updateSound(); } }).observe($('#quick'), { attributes: true, attributeFilter: ['class'] });
 function fly(from) {
   const a = from.getBoundingClientRect(), b = $('#cartBtn').getBoundingClientRect();
   const d = document.createElement('div'); d.className = 'fly';
@@ -299,8 +313,6 @@ function setSound(on, persist = true) {
   updateSound();
 }
 $('#soundBtn').onclick = () => setSound(!soundOn);
-const sndIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { curSnd = e.target.dataset.id || null; updateSound(); } }), { rootMargin: '-50% 0px -50% 0px' });
-$$('.product').forEach(el => sndIO.observe(el));
 const quietIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { curSnd = null; updateSound(); } }), { rootMargin: '-50% 0px -50% 0px' });
 $$('#hero,#light,.how,.foot').forEach(el => quietIO.observe(el));
 document.addEventListener('visibilitychange', () => { if (document.hidden) Object.values(aud).forEach(a => a.pause()); else updateSound(); });
