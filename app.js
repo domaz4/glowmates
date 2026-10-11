@@ -23,7 +23,7 @@ const I18N = {
   en: {
     title: 'Glow Mates — Massage Candles',
     desc: 'Soy wax massage candles. Melt, massage, relax. Creamy Dunes, Sea Yeah, Sakura Whisper.',
-    sound: 'Ambient sound', cart: 'Cart', openCart: 'Open cart', close: 'Close', less: 'Less', more: 'More', jar: 'Light the candle',
+    sound: 'Ambient sound', tapSound: 'Tap anywhere to turn on the sound 🔊', cart: 'Cart', openCart: 'Open cart', close: 'Close', less: 'Less', more: 'More', jar: 'Light the candle',
     tag: 'Soy wax candles that melt into warm massage oil.', pick: 'Pick your scent',
     melt: 'Melt.', massage: 'Massage.', relax: 'Relax.',
     'creamy.name': 'Creamy Dunes', 'creamy.scent': 'Coconut, vanilla bean',
@@ -55,7 +55,7 @@ const I18N = {
   ar: {
     title: 'Glow Mates — شموع التدليك',
     desc: 'شموع تدليك من شمع الصويا. ذوّب، دلّك، استرخِ. كريمي ديونز، سي ياه، ساكورا ويسبر.',
-    sound: 'الصوت', cart: 'السلة', openCart: 'افتح السلة', close: 'إغلاق', less: 'أقل', more: 'أكثر', jar: 'أشعل الشمعة',
+    sound: 'الصوت', tapSound: 'المس الشاشة لتشغيل الصوت 🔊', cart: 'السلة', openCart: 'افتح السلة', close: 'إغلاق', less: 'أقل', more: 'أكثر', jar: 'أشعل الشمعة',
     tag: 'شموع صويا تتحول إلى زيت تدليك دافئ.', pick: 'اختر رائحتك',
     melt: 'ذوّب.', massage: 'دلّك.', relax: 'استرخِ.',
     'creamy.name': 'كريمي ديونز', 'creamy.scent': 'جوز الهند، حبوب الفانيليا',
@@ -299,8 +299,26 @@ $('#orders').addEventListener('click', async e => {
 /* ---------- ambient sound per candle ---------- */
 const SND = { creamy: 'dunes.mp3', sea: 'sea.mp3', sakura: 'sakura.mp3' };
 const SND_VOL = .8;
-const aud = {}; let soundOn = false, curSnd = null, fading = false;
-Object.entries(SND).forEach(([id, src]) => { const a = new Audio(src); a.loop = true; a.preload = 'none'; a.volume = 0; aud[id] = a; a.addEventListener('ended', () => { a.currentTime = 0; if (soundOn && curSnd === id) a.play().catch(() => { }); }); });
+const aud = {}, vol = {}, gains = {};
+let soundOn = false, curSnd = null, fading = false, ctx = null, acted = false, ctxTried = false;
+Object.entries(SND).forEach(([id, src]) => {
+  const a = new Audio(src); a.loop = true; a.preload = 'none'; vol[id] = 0; aud[id] = a;
+  a.addEventListener('ended', () => { a.currentTime = 0; if (soundOn && curSnd === id) a.play().catch(() => { }); });
+});
+/* Web Audio gives real volume control on phones (audio.volume is ignored on iPhone, which made the sounds mix) */
+function initAudio() {
+  if (ctxTried || !acted) return; ctxTried = true;
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    ctx = new AC();
+    for (const id in aud) {
+      const g = ctx.createGain(); g.gain.value = 0;
+      ctx.createMediaElementSource(aud[id]).connect(g); g.connect(ctx.destination);
+      aud[id].volume = 1; gains[id] = g;
+    }
+  } catch { }
+}
+function applyVol(id, v) { vol[id] = v; if (gains[id]) gains[id].gain.value = v; else aud[id].volume = v; }
 function renderSoundBtn() {
   const b = $('#soundBtn'); if (!b) return;
   b.textContent = soundOn ? '🔊' : '🔇'; b.setAttribute('aria-pressed', soundOn); b.setAttribute('aria-label', t('sound')); b.title = t('sound');
@@ -308,19 +326,21 @@ function renderSoundBtn() {
 function fadeStep() {
   let busy = false;
   for (const id in aud) {
-    const a = aud[id], target = soundOn && curSnd === id ? SND_VOL : 0, d = target - a.volume;
-    if (Math.abs(d) > .015) { a.volume = Math.max(0, Math.min(1, a.volume + Math.sign(d) * .015)); busy = true; }
-    else a.volume = target;
-    if (target === 0 && a.volume === 0 && !a.paused) a.pause();
+    const a = aud[id], target = soundOn && curSnd === id ? SND_VOL : 0, cur = vol[id], d = target - cur;
+    if (Math.abs(d) > .015) { applyVol(id, Math.max(0, Math.min(1, cur + Math.sign(d) * .015))); busy = true; }
+    else applyVol(id, target);
+    if (target === 0 && vol[id] === 0 && !a.paused) a.pause();
   }
   if (busy) requestAnimationFrame(fadeStep); else fading = false;
 }
 function updateSound() {
-  for (const id in aud) { if (soundOn && curSnd === id && aud[id].paused) aud[id].play().catch(() => { }); }
+  initAudio();
+  if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => { });
+  for (const id in aud) { if (soundOn && curSnd === id && aud[id].paused) { applyVol(id, vol[id]); aud[id].play().catch(() => { }); } }
   if (!fading) { fading = true; requestAnimationFrame(fadeStep); }
 }
 function setSound(on, persist = true) {
-  soundOn = on; renderSoundBtn(); $('#soundBtn').classList.remove('pulse');
+  acted = true; soundOn = on; renderSoundBtn(); $('#soundBtn').classList.remove('pulse');
   if (persist) { try { localStorage.setItem('gm_sound', on ? 'on' : 'off'); } catch { } }
   updateSound();
 }
@@ -333,12 +353,16 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) Objec
 {
   let pref = null; try { pref = localStorage.getItem('gm_sound'); } catch { }
   if (pref !== 'off') {
-    // sound is ON by default; browsers only allow audio after the first tap/click/key, so it starts then
+    // sound is ON by default; browsers only allow audio after a real tap/click/key, so every one retries
     soundOn = true; renderSoundBtn();
-    const ev = ['pointerup', 'keydown', 'touchend'];
-    const arm = () => { ev.forEach(e => removeEventListener(e, arm)); updateSound(); };
-    ev.forEach(e => addEventListener(e, arm));
+    ['pointerup', 'keydown', 'touchend', 'click'].forEach(e => addEventListener(e, () => { acted = true; updateSound(); }, { passive: true }));
     updateSound();
+    // if a candle is on screen but nothing is playing yet, remind the visitor to tap
+    const hint = setInterval(() => {
+      if (!soundOn) return clearInterval(hint);
+      if (Object.values(aud).some(a => !a.paused)) return clearInterval(hint);
+      if (curSnd) toast(t('tapSound'));
+    }, 5000);
   }
 }
 
