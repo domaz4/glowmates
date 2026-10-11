@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Glow Mates — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=8">
+<style>
+  .admin-page{min-height:100svh;padding:28px clamp(14px,4vw,40px) 60px}
+  .admin-top{display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto 22px}
+  .admin-top a{font:400 1.7rem var(--serif);color:var(--ink);text-decoration:none}
+  .admin-top span{font-weight:700;opacity:.6}
+  .admin-page .card{margin:0 auto;transform:none}
+  .admin-page .card h3{margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="admin-page">
+  <div class="admin-top"><a href="/">Glow Mates</a><span>Admin</span></div>
+
+  <div class="card" id="loginCard">
+    <form id="login">
+      <h3>Log in</h3>
+      <label>Password<input type="password" id="pw" required autocomplete="current-password"></label>
+      <p id="loginErr" class="err" role="alert"></p>
+      <button class="btn wide" type="submit">Log in</button>
+    </form>
+  </div>
+
+  <div class="card wide-card" id="panel" hidden>
+    <div class="p-head"><h3>Orders</h3><button id="refresh" class="mini">Refresh</button><button id="logout" class="mini">Log out</button></div>
+    <div id="orders"></div>
+  </div>
+</div>
+<script src="config.js?v=8"></script>
+<script src="admin.js?v=8"></script>
+</body>
+</html>
