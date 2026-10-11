@@ -144,7 +144,7 @@ $('#step2').onsubmit = async e => {
   const btn = $('#send'); btn.disabled = true; btn.textContent = 'Sending…'; $('#err').textContent = '';
   try {
     const ext = (f.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5) || 'jpg';
-    const file = crypto.randomUUID() + '.' + ext;
+    const file = [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('') + '.' + ext;
     const up = await fetch(SB + '/storage/v1/object/proofs/' + file, { method: 'POST', headers: sbHead({ 'Content-Type': f.type || 'image/jpeg' }), body: f });
     if (!up.ok) throw new Error('Could not upload the screenshot. Try a smaller image.');
     const r = await rpc('place_order', { p_name: details.name, p_phone: details.phone, p_address: details.address, p_items: cart, p_shot: file });
