@@ -298,7 +298,7 @@ $('#orders').addEventListener('click', async e => {
 
 /* ---------- ambient sound per candle ---------- */
 const SND = { creamy: 'dunes.mp3', sea: 'sea.mp3', sakura: 'sakura.mp3' };
-const SND_VOL = .6;
+const SND_VOL = .8;
 const aud = {}; let soundOn = false, curSnd = null, fading = false;
 Object.entries(SND).forEach(([id, src]) => { const a = new Audio(src); a.loop = true; a.preload = 'none'; a.volume = 0; aud[id] = a; a.addEventListener('ended', () => { a.currentTime = 0; if (soundOn && curSnd === id) a.play().catch(() => { }); }); });
 function renderSoundBtn() {
@@ -332,11 +332,14 @@ $$('#hero,#light,.how,.foot').forEach(el => quietIO.observe(el));
 document.addEventListener('visibilitychange', () => { if (document.hidden) Object.values(aud).forEach(a => a.pause()); else updateSound(); });
 {
   let pref = null; try { pref = localStorage.getItem('gm_sound'); } catch { }
-  if (pref === 'on') {
-    // browsers only allow audio after a tap/click, so start on the first one
-    const arm = () => { removeEventListener('pointerdown', arm); removeEventListener('keydown', arm); setSound(true, false); };
-    addEventListener('pointerdown', arm); addEventListener('keydown', arm);
-  } else $('#soundBtn').classList.add('pulse');
+  if (pref !== 'off') {
+    // sound is ON by default; browsers only allow audio after the first tap/click/key, so it starts then
+    soundOn = true; renderSoundBtn();
+    const ev = ['pointerup', 'keydown', 'touchend'];
+    const arm = () => { ev.forEach(e => removeEventListener(e, arm)); updateSound(); };
+    ev.forEach(e => addEventListener(e, arm));
+    updateSound();
+  }
 }
 
 {
