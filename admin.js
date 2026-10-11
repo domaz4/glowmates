@@ -1,130 +1,55 @@
-const $ = (s, r = document) => r.querySelector(s);
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Glow Mates — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=8">
+<style>
+  .admin-page{min-height:100svh;padding:28px clamp(14px,4vw,40px) 60px}
+  .admin-top{display:flex;justify-content:space-between;align-items:center;max-width:900px;margin:0 auto 22px}
+  .admin-top a{font:400 1.7rem var(--serif);color:var(--ink);text-decoration:none}
+  .admin-top span{font-weight:700;opacity:.6}
+  .admin-page .card{margin:0 auto;transform:none}
+  .admin-page .card h3{margin-bottom:6px}
+  .stock-list{margin-bottom:22px}
+  .srow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1.5px solid #e3cdb9;border-radius:14px;padding:12px 16px;margin-bottom:10px}
+  .srow.out{border-color:#d62828}
+  .srow h4{font:400 1.4rem var(--serif);margin-right:auto}
+  .badge.out{background:#d62828;color:#fff}
+  .srow output{font:400 1.6rem var(--serif);min-width:2ch;text-align:center}
+  .srow .set{display:flex;gap:6px;align-items:center}
+  .srow .set input{width:90px;margin:0;padding:6px 10px;border-width:1.5px}
+  .hint{background:#f5b9b4;border-radius:10px;padding:10px 14px;font-size:.9rem;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="admin-page">
+  <div class="admin-top"><a href="/">Glow Mates</a><span>Admin</span></div>
 
-const GM = window.GM || {};
-const SB = (GM.SUPABASE_URL || '').replace(/\/$/, '');
-const sbHead = (extra = {}) => ({ apikey: GM.SUPABASE_ANON_KEY, ...(String(GM.SUPABASE_ANON_KEY).startsWith('eyJ') ? { Authorization: 'Bearer ' + GM.SUPABASE_ANON_KEY } : {}), ...extra });
-const rpc = (fn, body) => fetch(SB + '/rest/v1/rpc/' + fn, { method: 'POST', headers: sbHead({ 'Content-Type': 'application/json' }), body: JSON.stringify(body) });
-const proofUrl = f => SB + '/storage/v1/object/public/proofs/' + encodeURIComponent(f);
+  <div class="card" id="loginCard">
+    <form id="login">
+      <h3>Log in</h3>
+      <label>Password<input type="password" id="pw" required autocomplete="current-password"></label>
+      <p id="loginErr" class="err" role="alert"></p>
+      <button class="btn wide" type="submit">Log in</button>
+    </form>
+  </div>
 
-const CANDLES = [
-  { id: 'creamy', name: 'Creamy Dunes', img: 'images/creamy.jpg', tone: '#E9CFA0' },
-  { id: 'sea', name: 'Sea Yeah', img: 'images/sea.jpg', tone: '#F49A6B' },
-  { id: 'sakura', name: 'Sakura Whisper', img: 'images/sakura.jpg', tone: '#F4B9BE' }
-];
-const NAME2ID = { 'creamy dunes': 'creamy', 'sea yeah': 'sea', 'sakura whisper': 'sakura' };
-const LOW = 3;                       // "Running low" at this many or fewer
-let ORDERS = [], STOCK = {};
-
-let tt;
-function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 2400); }
-
-let adminPw = sessionStorage.getItem('gm_admin') || '';
-const showLogin = () => { adminPw = ''; sessionStorage.removeItem('gm_admin'); $('#panel').hidden = true; $('#loginCard').hidden = false; };
-
-$('#login').onsubmit = async e => {
-  e.preventDefault(); $('#loginErr').textContent = '';
-  adminPw = $('#pw').value;
-  const ok = await loadAll();
-  if (ok) { sessionStorage.setItem('gm_admin', adminPw); $('#pw').value = ''; } else { adminPw = ''; $('#loginErr').textContent = 'Wrong password'; }
-};
-$('#logout').onclick = showLogin;
-$('#refresh').onclick = () => loadAll();
-
-/* ---------- stock ---------- */
-function renderStock() {
-  $('#stock').innerHTML = CANDLES.map(c => {
-    const q = STOCK[c.id], known = q !== undefined;
-    const st = !known ? '' : q <= 0 ? 'out' : q <= LOW ? 'pending' : 'confirmed';
-    const label = !known ? 'Not set up' : q <= 0 ? 'No stock' : q <= LOW ? 'Running low' : 'In stock';
-    return `<div class="srow ${q <= 0 && known ? 'out' : ''}">
-      <h4>${esc(c.name)} <span class="badge ${st}">${label}</span></h4>
-      <button class="mini" data-sd="-1" data-id="${c.id}">−</button><output>${known ? q : '–'}</output><button class="mini" data-sd="1" data-id="${c.id}">+</button>
-      <span class="set"><input type="number" min="0" inputmode="numeric" placeholder="Set to" data-si="${c.id}"><button class="mini" data-ss="${c.id}">Set</button></span>
-    </div>`;
-  }).join('');
-}
-async function loadStock() {
-  try {
-    const r = await rpc('admin_get_stock', { p_pw: adminPw });
-    if (r.ok) { STOCK = await r.json(); $('#stockHint').hidden = true; } else { STOCK = {}; $('#stockHint').hidden = false; }
-  } catch { STOCK = {}; $('#stockHint').hidden = false; }
-  renderStock();
-}
-async function changeStock(id, fn, body) {
-  try {
-    const r = await rpc(fn, { p_pw: adminPw, p_id: id, ...body });
-    if (!r.ok) { toast('Could not update stock'); return; }
-    STOCK[id] = await r.json(); renderStock();
-  } catch { toast('Could not update stock'); }
-}
-$('#stock').addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.sd) changeStock(b.dataset.id, 'admin_add_stock', { p_delta: +b.dataset.sd });
-  else if (b.dataset.ss) {
-    const inp = $(`[data-si="${b.dataset.ss}"]`), v = parseInt(inp.value, 10);
-    if (isNaN(v) || v < 0) { toast('Type a number first'); return; }
-    changeStock(b.dataset.ss, 'admin_set_stock', { p_qty: v });
-  }
-});
-$('#stock').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.dataset.si) $(`[data-ss="${e.target.dataset.si}"]`).click(); });
-
-/* ---------- orders ---------- */
-function renderOrders() {
-  const list = ORDERS;
-  $('#orders').innerHTML = list.length ? list.map(o => `
-    <div class="order">
-      <div>
-        <h4>${esc(o.id)} <span class="badge ${esc(o.status)}">${esc(o.status)}</span></h4>
-        <p class="meta">${new Date(o.created_at).toLocaleString()}</p>
-        <p><b>${esc(o.name)}</b> · <a href="tel:${esc(o.phone)}">${esc(o.phone)}</a></p>
-        <p>${esc(o.address)}</p>
-        ${o.coupon ? `<p class="note">Coupon ${esc(o.coupon)} · −${esc(o.discount)} EGP</p>` : ''}
-        <ul>${o.items.map(i => `<li>${esc(i.qty)} × ${esc(i.name)}${i.note ? ` <span class="note">"${esc(i.note)}"</span>` : ''}</li>`).join('')}</ul>
-        <p><b>Total ${esc(o.total)} EGP</b></p>
-      </div>
-      ${o.screenshot === 'free-order' ? '<p class="note"><b>Free order, no payment needed</b></p>' : `<a href="${esc(proofUrl(o.screenshot))}" target="_blank" rel="noopener"><img src="${esc(proofUrl(o.screenshot))}" alt="Payment proof"></a>`}
-      <div class="acts">
-        <button class="mini" data-s="confirmed" data-id="${esc(o.id)}">Confirm</button>
-        <button class="mini" data-s="rejected" data-id="${esc(o.id)}">Reject</button>
-        <button class="mini" data-s="delivered" data-id="${esc(o.id)}">Delivered</button>
-        <button class="mini" data-s="pending" data-id="${esc(o.id)}">Pending</button>
-        <button class="mini" data-del="${esc(o.id)}">Delete</button>
-      </div>
-    </div>`).join('') : '<p class="empty">No orders yet.</p>';
-}
-async function loadOrders() {
-  if (!SB) return false;
-  const r = await rpc('admin_list', { p_pw: adminPw });
-  if (!r.ok) { showLogin(); return false; }
-  ORDERS = await r.json();
-  $('#loginCard').hidden = true; $('#panel').hidden = false;
-  renderOrders();
-  return true;
-}
-async function loadAll() { const ok = await loadOrders(); if (ok) await loadStock(); return ok; }
-
-/* confirming (or delivering) an order takes 1+ off the stock; rejecting / pending puts it back */
-async function syncStock(o, status) {
-  const items = (o.items || []).map(i => ({ id: i.id || NAME2ID[String(i.name || '').trim().toLowerCase()], qty: Math.max(1, +i.qty || 1) })).filter(i => i.id);
-  if (!items.length) return;
-  const deduct = status === 'confirmed' || status === 'delivered';
-  try {
-    const r = await rpc('admin_apply_order_stock', { p_pw: adminPw, p_order_id: String(o.id), p_items: items, p_deduct: deduct });
-    if (!r.ok) { toast('Status saved, but stock was not updated (run stock.sql)'); return; }
-    const j = await r.json();
-    if (j.changed) toast(deduct ? 'Stock updated' : 'Stock put back');
-  } catch { toast('Status saved, but stock was not updated'); }
-}
-
-$('#orders').addEventListener('click', async e => {
-  const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.s) {
-    const o = ORDERS.find(x => String(x.id) === b.dataset.id);
-    await rpc('admin_set_status', { p_pw: adminPw, p_id: b.dataset.id, p_status: b.dataset.s });
-    if (o) await syncStock(o, b.dataset.s);
-  } else if (b.dataset.del) { if (!confirm('Delete this order?')) return; await rpc('admin_delete', { p_pw: adminPw, p_id: b.dataset.del }); }
-  loadAll();
-});
-
-if (adminPw) loadAll();
+  <div class="card wide-card" id="panel" hidden>
+    <div class="p-head"><h3>Stock</h3><button id="refresh" class="mini">Refresh</button><button id="logout" class="mini">Log out</button></div>
+    <p id="stockHint" class="hint" hidden>Stock isn't set up yet. Run stock.sql once in the Supabase SQL Editor, then press Refresh.</p>
+    <div id="stock" class="stock-list"></div>
+    <div class="p-head"><h3>Orders</h3></div>
+    <div id="orders"></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script src="config.js?v=8"></script>
+<script src="admin.js?v=9"></script>
+</body>
+</html>
