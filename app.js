@@ -409,3 +409,17 @@ function burst() {
     d.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: `translate(${Math.cos(a) * r}px,${Math.sin(a) * r - 60}px) scale(0)`, opacity: 0 }], { duration: 900 + Math.random() * 700, easing: 'cubic-bezier(.2,.8,.3,1)' }).onfinish = () => d.remove();
   }
 }
+
+
+/* ---------- hero slideshow: candles <-> lip gloss, every 3s ---------- */
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  setInterval(() => {
+    const s = $$('.arch .slide');
+    if (s.length < 2) return;
+    let cur = s.findIndex(x => x.classList.contains('on'));
+    if (cur < 0) cur = 0;
+    s[cur].classList.remove('on');
+    s[(cur + 1) % s.length].classList.add('on');
+  }, 3000);
+})();
