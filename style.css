@@ -250,3 +250,13 @@ html[lang=ar] .shop h2{font-size:clamp(2.6rem,6.5vw,5rem)}
   .qv-card{grid-template-columns:1fr;gap:16px;padding:20px}
   .qv-img{max-height:38svh}
 }
+
+/* ---- reviews ---- */
+.reviews{min-height:0;padding-top:30px}
+.reviews h2{font:400 clamp(2.4rem,6vw,4.5rem)/1 var(--serif);letter-spacing:-.02em;margin:0 0 26px}
+html[lang=ar] .reviews h2{line-height:1.3;letter-spacing:0}
+.rev-box{border-radius:32px;padding:clamp(14px,3vw,34px);background:rgba(255,255,255,.4);box-shadow:0 30px 70px -40px rgba(60,20,5,.45);column-width:200px;column-gap:14px}
+.rev-box img{display:block;width:100%;border-radius:14px;margin:0 0 14px;break-inside:avoid;cursor:zoom-in;transition:transform .3s}
+.rev-box img:hover{transform:scale(1.02)}
+#lightbox{cursor:zoom-out;z-index:65}
+#lightbox img{max-width:min(94vw,900px);max-height:90svh;border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
