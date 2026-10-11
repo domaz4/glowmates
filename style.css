@@ -266,3 +266,8 @@ html[lang=ar] .reviews h2{line-height:1.3;letter-spacing:0}
 .ad-card img{width:100%;height:auto;display:block}
 .ad-card .x{color:#fff;background:rgba(0,0,0,.45);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:1.6rem;z-index:2;top:10px;right:10px}
 html[dir=rtl] .modal .ad-card .x{left:10px;right:auto}
+
+/* hero slideshow: candles <-> lip gloss */
+.arch .slides{position:relative;width:100%;height:112%}
+.arch .slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.06);transition:opacity 1s ease,transform 3.4s ease}
+.arch .slide.on{opacity:1;transform:scale(1)}
