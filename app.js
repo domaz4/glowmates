@@ -412,7 +412,7 @@ function burst() {
 (() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   setInterval(() => {
-    const s = $$('.arch .slide');
+    const s = $$('.arch .slide').filter(x => x.tagName !== 'DIV' || x.querySelector('img'));
     if (s.length < 2) return;
     let cur = s.findIndex(x => x.classList.contains('on'));
     if (cur < 0) cur = 0;
