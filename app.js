@@ -149,7 +149,7 @@ $('#step2').onsubmit = async e => {
     if (!up.ok) throw new Error('Could not upload the screenshot. Try a smaller image.');
     const r = await rpc('place_order', { p_name: details.name, p_phone: details.phone, p_address: details.address, p_items: cart, p_shot: file });
     const j = await r.json();
-    if (!r.ok) throw new Error('Could not place the order. Check your cart and try again.');
+    if (!r.ok) throw new Error('Could not place the order (' + r.status + '): ' + (j.message || j.hint || j.details || 'unknown error'));
     cart = []; save(); e.target.reset(); $('#step1').reset(); $('#shotPrev').hidden = true;
     $('#step2').hidden = true; $('.steps').hidden = true; $('#done').hidden = false; $('#doneId').textContent = j.id; setTimeout(burst, 150);
   } catch (er) { $('#err').textContent = er.message; }
