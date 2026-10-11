@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <script>try{if(localStorage.getItem("gm_lang")==="ar"){document.documentElement.lang="ar";document.documentElement.dir="rtl"}}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
 
@@ -29,7 +29,7 @@
   <div class="hero-words" aria-label="Glow Mates">
     <h1><span class="line"><span class="w">Glow</span></span><span class="line"><span class="w d2">Mates</span></span></h1>
     <p class="tag" data-i18n="tag">Soy wax candles that melt into warm massage oil.</p>
-    <a href="#creamy" class="btn" data-i18n="pick">Pick your scent</a>
+    <a href="#shop" class="btn" data-i18n="pick">Pick your scent</a>
   </div>
   <canvas id="embers" class="embers" aria-hidden="true"></canvas>
   <div class="hero-img">
@@ -43,51 +43,29 @@
   <span>Melt.</span><span>Massage.</span><span>Relax.</span><span>Melt.</span><span>Massage.</span><span>Relax.</span>
 </div></div>
 
-<section id="creamy" class="sec product" data-bg="#E9CFA0" data-ink="#3a2410" data-id="creamy">
-  <div class="p-img"><img src="images/creamy.jpg" alt="Creamy Dunes candle" loading="lazy"><i class="grain g1"></i></div>
-  <div class="p-info">
-    <p class="scent" data-i18n="creamy.scent">Coconut, vanilla bean</p>
-    <h2 class="split" data-i18n="creamy.name">Creamy Dunes</h2>
-    <p class="blurb" data-i18n="creamy.blurb">Warm sand, toasted coconut and soft vanilla. Light it, wait for the pool to melt, then pour it on skin.</p>
-    <ul class="made"><li data-i18n="made1">Soy wax</li><li data-i18n="made2">Shea butter</li><li data-i18n="made3">Sweet almond oil</li><li data-i18n="made4">Skin-safe fragrance</li></ul>
-    <div class="buy">
-      <div class="price">300 EGP</div>
-      <div class="qty"><button data-q="-1" data-i18n-aria="less" aria-label="Less">−</button><output>1</output><button data-q="1" data-i18n-aria="more" aria-label="More">+</button></div>
+<section id="shop" class="sec shop" data-bg="#F1DDC8" data-ink="#2a1710">
+  <div class="shop-in">
+    <h2 class="split" data-i18n="shopH">Our candles</h2>
+    <div class="grid">
+    <article class="pcard" data-id="creamy">
+      <div class="p-img"><img src="images/creamy.jpg" alt="Creamy Dunes candle" loading="lazy">
+        <div class="acts-ov"><button type="button" class="sq qa" data-i18n-aria="add" aria-label="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></button><button type="button" class="sq qv" data-i18n-aria="view" aria-label="Quick view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+      </div>
+      <div class="pinfo"><p class="pscent" data-i18n="creamy.scent">Coconut, vanilla bean</p><h3 class="pname" data-i18n="creamy.name">Creamy Dunes</h3><p class="price" data-price="creamy">300 EGP</p></div>
+    </article>
+    <article class="pcard" data-id="sea">
+      <div class="p-img"><img src="images/sea.jpg" alt="Sea Yeah candle" loading="lazy">
+        <div class="acts-ov"><button type="button" class="sq qa" data-i18n-aria="add" aria-label="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></button><button type="button" class="sq qv" data-i18n-aria="view" aria-label="Quick view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+      </div>
+      <div class="pinfo"><p class="pscent" data-i18n="sea.scent">Mango, passion fruit, pineapple, coconut</p><h3 class="pname" data-i18n="sea.name">Sea Yeah</h3><p class="price" data-price="sea">300 EGP</p></div>
+    </article>
+    <article class="pcard" data-id="sakura">
+      <div class="p-img"><img src="images/sakura.jpg" alt="Sakura Whisper candle" loading="lazy">
+        <div class="acts-ov"><button type="button" class="sq qa" data-i18n-aria="add" aria-label="Add to cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></button><button type="button" class="sq qv" data-i18n-aria="view" aria-label="Quick view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+      </div>
+      <div class="pinfo"><p class="pscent" data-i18n="sakura.scent">Cherry blossom, rose</p><h3 class="pname" data-i18n="sakura.name">Sakura Whisper</h3><p class="price" data-price="sakura">300 EGP</p></div>
+    </article>
     </div>
-    <label class="note-l"><span data-i18n="noteL">Note for this candle</span> <textarea rows="2" maxlength="300" data-i18n-ph="notePh" placeholder="Gift message, wick preference, anything we should know"></textarea></label>
-    <button class="btn add" data-i18n="add">Add to cart</button>
-  </div>
-</section>
-
-<section id="sea" class="sec product flip" data-bg="#F49A6B" data-ink="#3b1608" data-id="sea">
-  <div class="p-img"><img src="images/sea.jpg" alt="Sea Yeah candle" loading="lazy"><i class="grain g2"></i></div>
-  <div class="p-info">
-    <p class="scent" data-i18n="sea.scent">Mango, passion fruit, pineapple, coconut</p>
-    <h2 class="split" data-i18n="sea.name">Sea Yeah</h2>
-    <p class="blurb" data-i18n="sea.blurb">Sunset on a beach you wish you were on. Bright fruit up top, coconut underneath.</p>
-    <ul class="made"><li data-i18n="made1">Soy wax</li><li data-i18n="made2">Shea butter</li><li data-i18n="made3">Sweet almond oil</li><li data-i18n="made4">Skin-safe fragrance</li></ul>
-    <div class="buy">
-      <div class="price">300 EGP</div>
-      <div class="qty"><button data-q="-1" data-i18n-aria="less" aria-label="Less">−</button><output>1</output><button data-q="1" data-i18n-aria="more" aria-label="More">+</button></div>
-    </div>
-    <label class="note-l"><span data-i18n="noteL">Note for this candle</span> <textarea rows="2" maxlength="300" data-i18n-ph="notePh" placeholder="Gift message, wick preference, anything we should know"></textarea></label>
-    <button class="btn add" data-i18n="add">Add to cart</button>
-  </div>
-</section>
-
-<section id="sakura" class="sec product" data-bg="#F4B9BE" data-ink="#3a1420" data-id="sakura">
-  <div class="p-img"><img src="images/sakura.jpg" alt="Sakura Whisper candle" loading="lazy"><i class="grain g3"></i></div>
-  <div class="p-info">
-    <p class="scent" data-i18n="sakura.scent">Cherry blossom, rose</p>
-    <h2 class="split" data-i18n="sakura.name">Sakura Whisper</h2>
-    <p class="blurb" data-i18n="sakura.blurb">Soft florals for two. The one people buy for date night.</p>
-    <ul class="made"><li data-i18n="made1">Soy wax</li><li data-i18n="made2">Shea butter</li><li data-i18n="made3">Sweet almond oil</li><li data-i18n="made4">Skin-safe fragrance</li></ul>
-    <div class="buy">
-      <div class="price">300 EGP</div>
-      <div class="qty"><button data-q="-1" data-i18n-aria="less" aria-label="Less">−</button><output>1</output><button data-q="1" data-i18n-aria="more" aria-label="More">+</button></div>
-    </div>
-    <label class="note-l"><span data-i18n="noteL">Note for this candle</span> <textarea rows="2" maxlength="300" data-i18n-ph="notePh" placeholder="Gift message, wick preference, anything we should know"></textarea></label>
-    <button class="btn add" data-i18n="add">Add to cart</button>
   </div>
 </section>
 
@@ -171,6 +149,26 @@
   </div>
 </div>
 
+<!-- quick view -->
+<div id="quick" class="modal" aria-hidden="true">
+  <div class="card qv-card">
+    <button class="x" data-close data-i18n-aria="close" aria-label="Close">×</button>
+    <div class="qv-img"><img id="qvImg" src="images/creamy.jpg" alt=""></div>
+    <div class="qv-info">
+      <p class="scent" id="qvScent"></p>
+      <h2 id="qvName"></h2>
+      <p class="blurb" id="qvBlurb"></p>
+      <ul class="made"><li data-i18n="made1">Soy wax</li><li data-i18n="made2">Shea butter</li><li data-i18n="made3">Sweet almond oil</li><li data-i18n="made4">Skin-safe fragrance</li></ul>
+      <div class="buy">
+        <div class="price" id="qvPrice"></div>
+        <div class="qty"><button type="button" data-q="-1" data-i18n-aria="less" aria-label="Less">−</button><output id="qvQty">1</output><button type="button" data-q="1" data-i18n-aria="more" aria-label="More">+</button></div>
+      </div>
+      <label class="note-l"><span data-i18n="noteL">Note for this candle</span> <textarea id="qvNote" rows="2" maxlength="300" data-i18n-ph="notePh" placeholder="Gift message, wick preference, anything we should know"></textarea></label>
+      <button type="button" class="btn wide" id="qvAdd" data-i18n="add">Add to cart</button>
+    </div>
+  </div>
+</div>
+
 <!-- language picker -->
 <div id="langPick" class="modal" aria-hidden="true">
   <div class="card">
@@ -185,6 +183,6 @@
 
 <div id="toast" class="toast" role="status"></div>
 <script src="config.js?v=3"></script>
-<script src="app.js?v=8"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>
